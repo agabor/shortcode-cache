@@ -17,11 +17,11 @@ function shortcode_cache_wrap_shortcode_with_cache( $shortcode_name ) {
         $cache_key = shortcode_cache_generate_cache_key( $shortcode_name, $atts );
         $group     = 'shortcode_cache';
 
-        $output = wp_cache_get( $cache_key, $group );
+        $output = shortcode_cache_get( $cache_key, $group );
 
         if ( false === $output ) {
             $output = call_user_func( $original_callback, $atts );
-            wp_cache_set( $cache_key, $output, $group, HOUR_IN_SECONDS );
+            shortcode_cache_set( $cache_key, $output, $group, HOUR_IN_SECONDS );
             shortcode_cache_track_cached_item( $cache_key, $shortcode_name, $atts );
         }
 
@@ -55,4 +55,20 @@ function shortcode_cache_track_cached_item( $cache_key, $shortcode_name, $atts )
     );
 
     set_transient( 'shortcode_cache_items', $cached_items, DAY_IN_SECONDS );
+}
+
+function shortcode_cache_get( $cache_key, $group ) {
+    if ( wp_using_ext_object_cache() ) {
+        return wp_cache_get( $cache_key, $group );
+    }
+
+    return get_transient( $cache_key );
+}
+
+function shortcode_cache_set( $cache_key, $output, $group, $expiration ) {
+    if ( wp_using_ext_object_cache() ) {
+        wp_cache_set( $cache_key, $output, $group, $expiration );
+    } else {
+        set_transient( $cache_key, $output, $expiration );
+    }
 }

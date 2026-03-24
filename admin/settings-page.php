@@ -57,6 +57,16 @@ $cached_items = shortcode_cache_get_all_cached_items();
     <?php if ( empty( $cached_items ) ) : ?>
         <p><?php esc_html_e( 'No cached items at the moment.', 'shortcode-cache' ); ?></p>
     <?php else : ?>
+        <div class="shortcode-cache-actions" style="margin-bottom: 15px;">
+            <button
+                type="button"
+                class="button button-secondary shortcode-cache-clear-all-btn"
+                data-nonce="<?php echo esc_attr( wp_create_nonce( 'shortcode_cache_nonce' ) ); ?>"
+            >
+                <?php esc_html_e( 'Clear All Cache', 'shortcode-cache' ); ?>
+            </button>
+        </div>
+
         <table class="wp-list-table widefat striped">
             <thead>
                 <tr>

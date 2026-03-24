@@ -71,3 +71,6 @@ function shortcode_cache_clear_all_cache() {
     shortcode_cache_flush();
     delete_transient( 'shortcode_cache_items' );
 }
+
+add_action( 'wp_ajax_shortcode_cache_clear', 'shortcode_cache_handle_clear_cache' );
+add_action( 'wp_ajax_shortcode_cache_clear_all', 'shortcode_cache_handle_clear_all_cache' );

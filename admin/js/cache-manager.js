@@ -40,5 +40,42 @@
                 },
             });
         });
+
+        $(document).on('click', '.shortcode-cache-clear-all-btn', function (e) {
+            e.preventDefault();
+
+            const button = $(this);
+            const nonce = button.data('nonce');
+
+            if ( ! confirm( 'Are you sure you want to clear all cached items? This action cannot be undone.' ) ) {
+                return;
+            }
+
+            button.prop('disabled', true);
+            button.text('Clearing All...');
+
+            $.ajax({
+                url: shortcodeCacheData.ajaxUrl,
+                type: 'POST',
+                data: {
+                    action: 'shortcode_cache_clear_all',
+                    nonce: nonce,
+                },
+                success: function (response) {
+                    if (response.success) {
+                        location.reload();
+                    } else {
+                        button.prop('disabled', false);
+                        button.text('Clear All Cache');
+                        alert(response.data.message);
+                    }
+                },
+                error: function () {
+                    button.prop('disabled', false);
+                    button.text('Clear All Cache');
+                    alert('An error occurred while clearing all cache.');
+                },
+            });
+        });
     });
 })(jQuery);

@@ -25,3 +25,15 @@ function shortcode_cache_handle_clear_cache() {
         wp_send_json_error( array( 'message' => __( 'Failed to clear cache', 'shortcode-cache' ) ) );
     }
 }
+
+function shortcode_cache_handle_clear_all_cache() {
+    check_ajax_referer( 'shortcode_cache_nonce' );
+
+    if ( ! current_user_can( 'manage_options' ) ) {
+        wp_send_json_error( array( 'message' => __( 'Insufficient permissions', 'shortcode-cache' ) ) );
+    }
+
+    shortcode_cache_clear_all_cache();
+
+    wp_send_json_success( array( 'message' => __( 'All cache cleared successfully', 'shortcode-cache' ) ) );
+}

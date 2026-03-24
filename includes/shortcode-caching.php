@@ -56,19 +56,3 @@ function shortcode_cache_track_cached_item( $cache_key, $shortcode_name, $atts )
 
     set_transient( 'shortcode_cache_items', $cached_items, DAY_IN_SECONDS );
 }
-
-function shortcode_cache_get( $cache_key, $group ) {
-    if ( wp_using_ext_object_cache() ) {
-        return wp_cache_get( $cache_key, $group );
-    }
-
-    return get_transient( $cache_key );
-}
-
-function shortcode_cache_set( $cache_key, $output, $group, $expiration ) {
-    if ( wp_using_ext_object_cache() ) {
-        wp_cache_set( $cache_key, $output, $group, $expiration );
-    } else {
-        set_transient( $cache_key, $output, $expiration );
-    }
-}

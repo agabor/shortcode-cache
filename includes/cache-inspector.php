@@ -16,11 +16,7 @@ function shortcode_cache_get_all_cached_items() {
     foreach ( $cached_items as $cache_key => $item_data ) {
         $group = 'shortcode_cache';
         
-        if ( wp_using_ext_object_cache() ) {
-            $cached_value = wp_cache_get( $cache_key, $group );
-        } else {
-            $cached_value = get_transient( $cache_key );
-        }
+        $cached_value = shortcode_cache_get( $cache_key, $group );
 
         if ( false !== $cached_value ) {
             $items_with_status[ $cache_key ] = $item_data;
@@ -49,11 +45,7 @@ function shortcode_cache_extract_parameters_from_item( $item_data ) {
 function shortcode_cache_clear_specific_cache( $cache_key ) {
     $group = 'shortcode_cache';
     
-    if ( wp_using_ext_object_cache() ) {
-        $success = wp_cache_delete( $cache_key, $group );
-    } else {
-        $success = delete_transient( $cache_key );
-    }
+    $success = shortcode_cache_delete( $cache_key, $group );
 
     if ( $success ) {
         $cached_items = get_transient( 'shortcode_cache_items' );
@@ -68,17 +60,14 @@ function shortcode_cache_clear_specific_cache( $cache_key ) {
 }
 
 function shortcode_cache_clear_all_cache() {
-    if ( wp_using_ext_object_cache() ) {
-        wp_cache_flush();
-    } else {
-        $cached_items = get_transient( 'shortcode_cache_items' );
-        
-        if ( is_array( $cached_items ) ) {
-            foreach ( $cached_items as $cache_key => $item_data ) {
-                delete_transient( $cache_key );
-            }
+    $cached_items = get_transient( 'shortcode_cache_items' );
+    
+    if ( is_array( $cached_items ) ) {
+        foreach ( $cached_items as $cache_key => $item_data ) {
+            shortcode_cache_delete( $cache_key, 'shortcode_cache' );
         }
     }
     
+    shortcode_cache_flush();
     delete_transient( 'shortcode_cache_items' );
 }

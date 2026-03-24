@@ -18,6 +18,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 define( 'SHORTCODE_CACHE_DIR', plugin_dir_path( __FILE__ ) );
 define( 'SHORTCODE_CACHE_URL', plugin_dir_url( __FILE__ ) );
 
+require_once SHORTCODE_CACHE_DIR . 'includes/cache-operations.php';
 require_once SHORTCODE_CACHE_DIR . 'includes/shortcode-caching.php';
 require_once SHORTCODE_CACHE_DIR . 'includes/cache-inspector.php';
 require_once SHORTCODE_CACHE_DIR . 'admin/settings-handler.php';

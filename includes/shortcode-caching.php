@@ -22,6 +22,7 @@ function shortcode_cache_wrap_shortcode_with_cache( $shortcode_name ) {
         if ( false === $output ) {
             $output = call_user_func( $original_callback, $atts );
             wp_cache_set( $cache_key, $output, $group, HOUR_IN_SECONDS );
+            shortcode_cache_track_cached_item( $cache_key, $shortcode_name, $atts );
         }
 
         return $output;
@@ -34,4 +35,24 @@ function shortcode_cache_generate_cache_key( $shortcode_name, $atts ) {
     $hash = md5( $serialized );
 
     return 'shortcode_' . $shortcode_name . '_' . $hash;
+}
+
+function shortcode_cache_track_cached_item( $cache_key, $shortcode_name, $atts ) {
+    $cached_items = get_transient( 'shortcode_cache_items' );
+
+    if ( false === $cached_items ) {
+        $cached_items = array();
+    }
+
+    if ( ! is_array( $cached_items ) ) {
+        $cached_items = array();
+    }
+
+    $cached_items[ $cache_key ] = array(
+        'shortcode' => $shortcode_name,
+        'parameters' => (array) $atts,
+        'timestamp' => time(),
+    );
+
+    set_transient( 'shortcode_cache_items', $cached_items, DAY_IN_SECONDS );
 }

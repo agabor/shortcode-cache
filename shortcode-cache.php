@@ -19,19 +19,43 @@ define( 'SHORTCODE_CACHE_DIR', plugin_dir_path( __FILE__ ) );
 define( 'SHORTCODE_CACHE_URL', plugin_dir_url( __FILE__ ) );
 
 require_once SHORTCODE_CACHE_DIR . 'includes/shortcode-caching.php';
+require_once SHORTCODE_CACHE_DIR . 'includes/cache-inspector.php';
 require_once SHORTCODE_CACHE_DIR . 'admin/settings-handler.php';
+require_once SHORTCODE_CACHE_DIR . 'admin/ajax-handler.php';
 
 add_action( 'admin_menu', 'shortcode_cache_register_admin_menu' );
 add_action( 'admin_init', 'shortcode_cache_register_settings' );
 add_action( 'init', 'shortcode_cache_initialize_shortcode_caching', 20 );
+add_action( 'wp_ajax_shortcode_cache_clear', 'shortcode_cache_handle_clear_cache' );
 
 function shortcode_cache_register_admin_menu() {
-    add_options_page(
+    $hook_suffix = add_options_page(
         __( 'Shortcode Cache Settings', 'shortcode-cache' ),
         __( 'Shortcode Cache', 'shortcode-cache' ),
         'manage_options',
         'shortcode-cache-settings',
         'shortcode_cache_render_settings_page'
+    );
+
+    add_action( "load-{$hook_suffix}", 'shortcode_cache_enqueue_admin_scripts' );
+}
+
+function shortcode_cache_enqueue_admin_scripts() {
+    wp_enqueue_script(
+        'shortcode-cache-manager',
+        SHORTCODE_CACHE_URL . 'admin/js/cache-manager.js',
+        array( 'jquery' ),
+        '1.0.0',
+        true
+    );
+
+    wp_localize_script(
+        'shortcode-cache-manager',
+        'shortcodeCacheData',
+        array(
+            'ajaxUrl' => admin_url( 'admin-ajax.php' ),
+            'nonce' => wp_create_nonce( 'shortcode_cache_nonce' ),
+        )
     );
 }
 

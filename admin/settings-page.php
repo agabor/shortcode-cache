@@ -7,6 +7,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 $shortcodes = shortcode_cache_get_cached_shortcodes();
 $shortcodes_text = implode( "\n", $shortcodes );
 $show_success = isset( $_GET['settings-updated'] ) && $_GET['settings-updated'];
+$cached_items = shortcode_cache_get_all_cached_items();
 ?>
 
 <div class="wrap">
@@ -48,4 +49,39 @@ $show_success = isset( $_GET['settings-updated'] ) && $_GET['settings-updated'];
 
         <?php submit_button(); ?>
     </form>
+
+    <hr />
+
+    <h2><?php esc_html_e( 'Cached Items', 'shortcode-cache' ); ?></h2>
+
+    <?php if ( empty( $cached_items ) ) : ?>
+        <p><?php esc_html_e( 'No cached items at the moment.', 'shortcode-cache' ); ?></p>
+    <?php else : ?>
+        <table class="wp-list-table widefat striped">
+            <thead>
+                <tr>
+                    <th scope="col"><?php esc_html_e( 'Shortcode', 'shortcode-cache' ); ?></th>
+                    <th scope="col"><?php esc_html_e( 'Parameters', 'shortcode-cache' ); ?></th>
+                    <th scope="col"><?php esc_html_e( 'Action', 'shortcode-cache' ); ?></th>
+                </tr>
+            </thead>
+            <tbody>
+                <?php foreach ( $cached_items as $cache_key => $item_data ) : ?>
+                    <tr>
+                        <td><?php echo esc_html( $item_data['shortcode'] ); ?></td>
+                        <td><?php echo shortcode_cache_extract_parameters_from_item( $item_data ); ?></td>
+                        <td>
+                            <button
+                                type="button"
+                                class="button button-small shortcode-cache-clear-btn"
+                                data-cache-key="<?php echo esc_attr( $cache_key ); ?>"
+                            >
+                                <?php esc_html_e( 'Clear Cache', 'shortcode-cache' ); ?>
+                            </button>
+                        </td>
+                    </tr>
+                <?php endforeach; ?>
+            </tbody>
+        </table>
+    <?php endif; ?>
 </div>

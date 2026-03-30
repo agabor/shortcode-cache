@@ -6,8 +6,10 @@ if ( ! defined( 'ABSPATH' ) ) {
 
 $shortcodes = shortcode_cache_get_cached_shortcodes();
 $shortcodes_text = implode( "\n", $shortcodes );
+$monitored_url = shortcode_cache_get_monitored_url();
 $show_success = isset( $_GET['settings-updated'] ) && $_GET['settings-updated'];
 $cached_items = shortcode_cache_get_all_cached_items();
+$detected_shortcodes = shortcode_cache_get_detected_shortcodes();
 ?>
 
 <div class="wrap">
@@ -24,6 +26,26 @@ $cached_items = shortcode_cache_get_all_cached_items();
 
         <table class="form-table" role="presentation">
             <tbody>
+                <tr>
+                    <th scope="row">
+                        <label for="shortcode_cache_monitored_url">
+                            <?php esc_html_e( 'Monitored URL', 'shortcode-cache' ); ?>
+                        </label>
+                    </th>
+                    <td>
+                        <input
+                            type="url"
+                            id="shortcode_cache_monitored_url"
+                            name="shortcode_cache_monitored_url"
+                            value="<?php echo esc_attr( $monitored_url ); ?>"
+                            class="regular-text"
+                            placeholder="<?php esc_attr_e( 'https://example.com/page', 'shortcode-cache' ); ?>"
+                        />
+                        <p class="description">
+                            <?php esc_html_e( 'Enter the full URL of the page to monitor for shortcode detection. Shortcodes will be automatically detected when this page is visited.', 'shortcode-cache' ); ?>
+                        </p>
+                    </td>
+                </tr>
                 <tr>
                     <th scope="row">
                         <label for="shortcode_cache_list">
@@ -52,6 +74,40 @@ $cached_items = shortcode_cache_get_all_cached_items();
 
     <hr />
 
+    <h2><?php esc_html_e( 'Detected Shortcodes', 'shortcode-cache' ); ?></h2>
+
+    <?php if ( empty( $detected_shortcodes ) ) : ?>
+        <p><?php esc_html_e( 'No shortcodes detected yet. Visit the monitored URL to detect shortcodes.', 'shortcode-cache' ); ?></p>
+    <?php else : ?>
+        <div class="shortcode-cache-actions" style="margin-bottom: 15px;">
+            <button
+                type="button"
+                class="button button-secondary shortcode-cache-clear-detected-btn"
+            >
+                <?php esc_html_e( 'Clear Detected Shortcodes', 'shortcode-cache' ); ?>
+            </button>
+        </div>
+
+        <table class="wp-list-table widefat striped">
+            <thead>
+                <tr>
+                    <th scope="col"><?php esc_html_e( 'Shortcode Name', 'shortcode-cache' ); ?></th>
+                    <th scope="col"><?php esc_html_e( 'Usage Count', 'shortcode-cache' ); ?></th>
+                </tr>
+            </thead>
+            <tbody>
+                <?php foreach ( $detected_shortcodes as $shortcode_name => $count ) : ?>
+                    <tr>
+                        <td><?php echo esc_html( $shortcode_name ); ?></td>
+                        <td><?php echo esc_html( $count ); ?></td>
+                    </tr>
+                <?php endforeach; ?>
+            </tbody>
+        </table>
+    <?php endif; ?>
+
+    <hr />
+
     <h2><?php esc_html_e( 'Cached Items', 'shortcode-cache' ); ?></h2>
 
     <?php if ( empty( $cached_items ) ) : ?>
@@ -61,7 +117,6 @@ $cached_items = shortcode_cache_get_all_cached_items();
             <button
                 type="button"
                 class="button button-secondary shortcode-cache-clear-all-btn"
-                data-nonce="<?php echo esc_attr( wp_create_nonce( 'shortcode_cache_nonce' ) ); ?>"
             >
                 <?php esc_html_e( 'Clear All Cache', 'shortcode-cache' ); ?>
             </button>

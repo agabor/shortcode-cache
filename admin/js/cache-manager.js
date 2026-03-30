@@ -16,7 +16,6 @@
                 data: {
                     action: 'shortcode_cache_clear',
                     cache_key: cacheKey,
-                    nonce: shortcodeCacheData.nonce,
                 },
                 success: function (response) {
                     if (response.success) {
@@ -45,7 +44,6 @@
             e.preventDefault();
 
             const button = $(this);
-            const nonce = button.data('nonce');
 
             if ( ! confirm( 'Are you sure you want to clear all cached items? This action cannot be undone.' ) ) {
                 return;
@@ -59,7 +57,6 @@
                 type: 'POST',
                 data: {
                     action: 'shortcode_cache_clear_all',
-                    nonce: nonce,
                 },
                 success: function (response) {
                     if (response.success) {
@@ -74,6 +71,41 @@
                     button.prop('disabled', false);
                     button.text('Clear All Cache');
                     alert('An error occurred while clearing all cache.');
+                },
+            });
+        });
+
+        $(document).on('click', '.shortcode-cache-clear-detected-btn', function (e) {
+            e.preventDefault();
+
+            const button = $(this);
+
+            if ( ! confirm( 'Are you sure you want to clear detected shortcodes? This action cannot be undone.' ) ) {
+                return;
+            }
+
+            button.prop('disabled', true);
+            button.text('Clearing...');
+
+            $.ajax({
+                url: shortcodeCacheData.ajaxUrl,
+                type: 'POST',
+                data: {
+                    action: 'shortcode_cache_clear_detected',
+                },
+                success: function (response) {
+                    if (response.success) {
+                        location.reload();
+                    } else {
+                        button.prop('disabled', false);
+                        button.text('Clear Detected Shortcodes');
+                        alert(response.data.message);
+                    }
+                },
+                error: function () {
+                    button.prop('disabled', false);
+                    button.text('Clear Detected Shortcodes');
+                    alert('An error occurred while clearing detected shortcodes.');
                 },
             });
         });

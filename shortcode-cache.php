@@ -2,7 +2,7 @@
 /**
  * Plugin Name: Shortcode Cache
  * Description: Cache rendered HTML for specific shortcodes
- * Version: 1.0.0
+ * Version: 1.0.2
  * Author: Gabor Angyal
  * Author URI: https://webshop.tech
  * License: GPL v2 or later
@@ -21,6 +21,7 @@ define( 'SHORTCODE_CACHE_URL', plugin_dir_url( __FILE__ ) );
 require_once SHORTCODE_CACHE_DIR . 'includes/cache-operations.php';
 require_once SHORTCODE_CACHE_DIR . 'includes/shortcode-caching.php';
 require_once SHORTCODE_CACHE_DIR . 'includes/cache-inspector.php';
+require_once SHORTCODE_CACHE_DIR . 'includes/url-detection.php';
 require_once SHORTCODE_CACHE_DIR . 'admin/settings-handler.php';
 require_once SHORTCODE_CACHE_DIR . 'admin/ajax-handler.php';
 
@@ -28,6 +29,8 @@ add_action( 'admin_menu', 'shortcode_cache_register_admin_menu' );
 add_action( 'admin_init', 'shortcode_cache_register_settings' );
 add_action( 'init', 'shortcode_cache_initialize_shortcode_caching', 20 );
 add_action( 'wp_ajax_shortcode_cache_clear', 'shortcode_cache_handle_clear_cache' );
+add_action( 'wp_ajax_shortcode_cache_clear_detected', 'shortcode_cache_handle_clear_detected_shortcodes' );
+add_action( 'wp', 'shortcode_cache_detect_current_page_shortcodes', 999 );
 
 function shortcode_cache_register_admin_menu() {
     $hook_suffix = add_options_page(
@@ -46,7 +49,7 @@ function shortcode_cache_enqueue_admin_scripts() {
         'shortcode-cache-manager',
         SHORTCODE_CACHE_URL . 'admin/js/cache-manager.js',
         array( 'jquery' ),
-        '1.0.0',
+        '1.0.2',
         true
     );
 
@@ -55,7 +58,6 @@ function shortcode_cache_enqueue_admin_scripts() {
         'shortcodeCacheData',
         array(
             'ajaxUrl' => admin_url( 'admin-ajax.php' ),
-            'nonce' => wp_create_nonce( 'shortcode_cache_nonce' ),
         )
     );
 }
@@ -64,6 +66,11 @@ function shortcode_cache_register_settings() {
     register_setting(
         'shortcode_cache_group',
         'shortcode_cache_list'
+    );
+
+    register_setting(
+        'shortcode_cache_group',
+        'shortcode_cache_monitored_url'
     );
 }
 

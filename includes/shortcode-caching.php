@@ -15,14 +15,14 @@ function shortcode_cache_wrap_shortcode_with_cache( $shortcode_name, $shortcode_
     $configured_id = isset( $shortcode_config['id'] ) ? $shortcode_config['id'] : null;
 
     $shortcode_tags[ $shortcode_name ] = function( $atts = array(), $content = '', $tag = '' ) use ( $original_callback, $shortcode_name, $configured_id, $shortcode_config ) {
-        $should_use_cache = shortcode_cache_should_use_cache( $shortcode_name, $configured_id );
+        $should_use_cache = shortcode_cache_should_use_cache($atts, $configured_id);
 
         if ( ! $should_use_cache ) {
             return call_user_func( $original_callback, $atts, $content, $tag );
         }
 
         $role_caching_enabled = shortcode_cache_is_role_caching_enabled_for_shortcode( $shortcode_name, $configured_id );
-        $cache_key = shortcode_cache_generate_cache_key( $shortcode_name, $atts, $role_caching_enabled, $configured_id );
+        $cache_key = shortcode_cache_generate_cache_key($shortcode_name, $atts, $role_caching_enabled);
         $group     = 'shortcode_cache';
 
         $output = shortcode_cache_get( $cache_key, $group );
@@ -53,7 +53,14 @@ function shortcode_cache_wrap_shortcode_for_detection( $shortcode_name ) {
     };
 }
 
-function shortcode_cache_should_use_cache( $shortcode_name, $configured_id = null ) {
+function shortcode_cache_should_use_cache($atts, $configured_id) {
+
+    if ($configured_id) {
+        if ($atts['id'] !== $configured_id) {
+            return false;
+        }
+    }
+
     $allowed_roles = shortcode_cache_get_global_allowed_roles();
 
     $current_user = wp_get_current_user();
@@ -77,25 +84,25 @@ function shortcode_cache_should_use_cache( $shortcode_name, $configured_id = nul
     return false;
 }
 
-function shortcode_cache_generate_cache_key( $shortcode_name, $atts, $role_caching_enabled = false, $configured_id = null ) {
+function shortcode_cache_generate_cache_key($shortcode_name, $atts, $role_caching_enabled) {
     $atts = (array) $atts;
 
-    $key = 'shortcode_' . $shortcode_name;
+    $shortcode_key = 'shortcode_' . $shortcode_name;
 
     foreach ( $atts as $key => $value ) {
-            $key .= '_' .esc_html( $key ) . '|' . esc_html( $value );
+        $shortcode_key .= '_' .esc_html( $key ) . '|' . esc_html( $value );
     }
 
     if ( $role_caching_enabled ) {
         $current_user = wp_get_current_user();
         $user_role = ! empty( $current_user->roles ) ? $current_user->roles[0] : 'guest';
-        $key .= '_role|' . $user_role;
+        $shortcode_key .= '_role|' . $user_role;
     }
 
-    return $key;
+    return $shortcode_key;
 }
 
-function shortcode_cache_track_cached_item( $cache_key, $shortcode_name, $atts, $role_caching_enabled = false, $configured_id = null ) {
+function shortcode_cache_track_cached_item( $cache_key, $shortcode_name, $atts, $role_caching_enabled, $configured_id ) {
     $cached_items = get_transient( 'shortcode_cache_items' );
 
     if ( false === $cached_items ) {

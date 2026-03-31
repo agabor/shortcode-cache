@@ -2,7 +2,7 @@
 /**
  * Plugin Name: Shortcode Cache
  * Description: Cache rendered HTML for specific shortcodes
- * Version: 1.1.7
+ * Version: 1.1.8
  * Author: Gabor Angyal
  * Author URI: https://webshop.tech
  * License: GPL v2 or later
@@ -55,7 +55,7 @@ function shortcode_cache_enqueue_admin_scripts() {
         'shortcode-cache-manager',
         SHORTCODE_CACHE_URL . 'admin/js/cache-manager.js',
         array( 'jquery' ),
-        '1.1.7',
+        '1.1.8',
         true
     );
 
@@ -63,7 +63,7 @@ function shortcode_cache_enqueue_admin_scripts() {
         'shortcode-cache-settings-manager',
         SHORTCODE_CACHE_URL . 'admin/js/settings-list-manager.js',
         array( 'jquery' ),
-        '1.1.7',
+        '1.1.8',
         true
     );
 
@@ -71,7 +71,7 @@ function shortcode_cache_enqueue_admin_scripts() {
         'shortcode-cache-settings-manager',
         SHORTCODE_CACHE_URL . 'admin/css/settings-manager.css',
         array(),
-        '1.1.7'
+        '1.1.8'
     );
 
     wp_localize_script(
@@ -119,7 +119,7 @@ function shortcode_cache_get_cached_shortcodes() {
 
     foreach ( $config as $shortcode_item ) {
         if ( isset( $shortcode_item['name'] ) && ! empty( $shortcode_item['name'] ) ) {
-            $shortcodes[] = $shortcode_item['name'];
+            $shortcodes[] = $shortcode_item;
         }
     }
 
@@ -131,9 +131,11 @@ function shortcode_cache_initialize_shortcode_caching() {
 
     $shortcodes_to_cache = shortcode_cache_get_cached_shortcodes();
 
-    foreach ( $shortcodes_to_cache as $shortcode_name ) {
+    foreach ( $shortcodes_to_cache as $shortcode_config ) {
+        $shortcode_name = $shortcode_config['name'];
+        
         if ( isset( $shortcode_tags[ $shortcode_name ] ) ) {
-            shortcode_cache_wrap_shortcode_with_cache( $shortcode_name );
+            shortcode_cache_wrap_shortcode_with_cache( $shortcode_name, $shortcode_config );
         }
     }
 }

@@ -84,8 +84,8 @@ $all_roles = shortcode_cache_get_all_roles();
     <h2><?php esc_html_e( 'Shortcodes to Cache', 'shortcode-cache' ); ?></h2>
 
     <div class="shortcode-cache-add-form" style="background: #f9f9f9; padding: 15px; border: 1px solid #ddd; border-radius: 4px; margin-bottom: 20px;">
-        <div style="display: flex; gap: 10px; align-items: flex-end;">
-            <div style="flex: 1;">
+        <div style="display: grid; grid-template-columns: 1fr 1fr auto; gap: 10px; align-items: flex-end;">
+            <div>
                 <label for="shortcode_cache_new_name" style="display: block; margin-bottom: 5px; font-weight: bold;">
                     <?php esc_html_e( 'Shortcode Name', 'shortcode-cache' ); ?>
                 </label>
@@ -94,6 +94,17 @@ $all_roles = shortcode_cache_get_all_roles();
                     id="shortcode_cache_new_name"
                     class="regular-text shortcode-cache-new-name"
                     placeholder="<?php esc_attr_e( 'e.g., products-list', 'shortcode-cache' ); ?>"
+                />
+            </div>
+            <div>
+                <label for="shortcode_cache_new_id" style="display: block; margin-bottom: 5px; font-weight: bold;">
+                    <?php esc_html_e( 'ID (optional)', 'shortcode-cache' ); ?>
+                </label>
+                <input
+                    type="text"
+                    id="shortcode_cache_new_id"
+                    class="regular-text shortcode-cache-new-id"
+                    placeholder="<?php esc_attr_e( 'e.g., homepage-products', 'shortcode-cache' ); ?>"
                 />
             </div>
             <button
@@ -112,6 +123,7 @@ $all_roles = shortcode_cache_get_all_roles();
             <thead>
                 <tr>
                     <th scope="col"><?php esc_html_e( 'Shortcode Name', 'shortcode-cache' ); ?></th>
+                    <th scope="col"><?php esc_html_e( 'ID', 'shortcode-cache' ); ?></th>
                     <th scope="col" class="shortcode-cache-role-column"><?php esc_html_e( 'Cache by Role', 'shortcode-cache' ); ?></th>
                     <th scope="col"><?php esc_html_e( 'Action', 'shortcode-cache' ); ?></th>
                 </tr>
@@ -124,6 +136,11 @@ $all_roles = shortcode_cache_get_all_roles();
                                 <?php echo esc_html( $item['name'] ); ?>
                             </span>
                             <input type="hidden" class="shortcode-cache-item-index" value="<?php echo esc_attr( $index ); ?>" />
+                        </td>
+                        <td>
+                            <span class="shortcode-cache-item-id">
+                                <?php echo isset( $item['id'] ) && ! empty( $item['id'] ) ? esc_html( $item['id'] ) : '—'; ?>
+                            </span>
                         </td>
                         <td class="shortcode-cache-role-column">
                             <label class="shortcode-cache-role-toggle">
@@ -170,14 +187,14 @@ $all_roles = shortcode_cache_get_all_roles();
         <table class="wp-list-table widefat striped">
             <thead>
                 <tr>
-                    <th scope="col"><?php esc_html_e( 'Shortcode Name', 'shortcode-cache' ); ?></th>
+                    <th scope="col"><?php esc_html_e( 'Shortcode', 'shortcode-cache' ); ?></th>
                     <th scope="col"><?php esc_html_e( 'Usage Count', 'shortcode-cache' ); ?></th>
                 </tr>
             </thead>
             <tbody>
-                <?php foreach ( $detected_shortcodes as $shortcode_name => $count ) : ?>
+                <?php foreach ( $detected_shortcodes as $shortcode_key => $count ) : ?>
                     <tr>
-                        <td><?php echo esc_html( $shortcode_name ); ?></td>
+                        <td><?php echo esc_html( shortcode_cache_format_detected_shortcode_name( $shortcode_key ) ); ?></td>
                         <td><?php echo esc_html( $count ); ?></td>
                     </tr>
                 <?php endforeach; ?>
@@ -205,6 +222,7 @@ $all_roles = shortcode_cache_get_all_roles();
             <thead>
                 <tr>
                     <th scope="col"><?php esc_html_e( 'Shortcode', 'shortcode-cache' ); ?></th>
+                    <th scope="col"><?php esc_html_e( 'ID', 'shortcode-cache' ); ?></th>
                     <th scope="col"><?php esc_html_e( 'Parameters', 'shortcode-cache' ); ?></th>
                     <th scope="col"><?php esc_html_e( 'Action', 'shortcode-cache' ); ?></th>
                 </tr>
@@ -213,6 +231,7 @@ $all_roles = shortcode_cache_get_all_roles();
                 <?php foreach ( $cached_items as $cache_key => $item_data ) : ?>
                     <tr>
                         <td><?php echo esc_html( $item_data['shortcode'] ); ?></td>
+                        <td><?php echo isset( $item_data['id'] ) && ! empty( $item_data['id'] ) ? esc_html( $item_data['id'] ) : '—'; ?></td>
                         <td><?php echo shortcode_cache_extract_parameters_from_item( $item_data ); ?></td>
                         <td>
                             <button

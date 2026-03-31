@@ -52,6 +52,15 @@ function shortcode_cache_get_detected_shortcodes() {
     return $detected;
 }
 
+function shortcode_cache_format_detected_shortcode_name( $key ) {
+    if ( strpos( $key, '::' ) === false ) {
+        return $key;
+    }
+
+    list( $name, $id ) = explode( '::', $key, 2 );
+    return $name . ' [ID: ' . esc_html( $id ) . ']';
+}
+
 function shortcode_cache_clear_detected_shortcodes() {
     delete_transient( 'shortcode_cache_detected_shortcodes' );
 }

@@ -50,6 +50,7 @@ function shortcode_cache_handle_add_shortcode() {
     }
 
     $shortcode_name = isset( $_POST['shortcode_name'] ) ? sanitize_text_field( $_POST['shortcode_name'] ) : '';
+    $shortcode_id = isset( $_POST['shortcode_id'] ) ? sanitize_text_field( $_POST['shortcode_id'] ) : '';
 
     if ( empty( $shortcode_name ) ) {
         wp_send_json_error( array( 'message' => __( 'Shortcode name cannot be empty', 'shortcode-cache' ) ) );
@@ -63,7 +64,10 @@ function shortcode_cache_handle_add_shortcode() {
 
     foreach ( $config as $item ) {
         if ( isset( $item['name'] ) && $item['name'] === $shortcode_name ) {
-            wp_send_json_error( array( 'message' => __( 'This shortcode is already in the list', 'shortcode-cache' ) ) );
+            $item_id = isset( $item['id'] ) ? $item['id'] : '';
+            if ( $item_id === $shortcode_id ) {
+                wp_send_json_error( array( 'message' => __( 'This shortcode configuration is already in the list', 'shortcode-cache' ) ) );
+            }
         }
     }
 
@@ -71,6 +75,10 @@ function shortcode_cache_handle_add_shortcode() {
         'name' => $shortcode_name,
         'cache_by_role' => false,
     );
+
+    if ( ! empty( $shortcode_id ) ) {
+        $new_item['id'] = $shortcode_id;
+    }
 
     $config[] = $new_item;
 

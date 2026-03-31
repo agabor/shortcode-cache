@@ -35,7 +35,7 @@ function shortcode_cache_is_global_role_caching_enabled() {
     return ! empty( $allowed_roles );
 }
 
-function shortcode_cache_is_role_caching_enabled_for_shortcode( $shortcode_name ) {
+function shortcode_cache_is_role_caching_enabled_for_shortcode( $shortcode_name, $configured_id = null ) {
     $config = get_option( 'shortcode_cache_config', array() );
 
     if ( ! is_array( $config ) ) {
@@ -44,7 +44,16 @@ function shortcode_cache_is_role_caching_enabled_for_shortcode( $shortcode_name 
 
     foreach ( $config as $item ) {
         if ( isset( $item['name'] ) && $item['name'] === $shortcode_name ) {
-            return isset( $item['cache_by_role'] ) && (bool) $item['cache_by_role'];
+            $id_matches = true;
+            if ( null !== $configured_id ) {
+                $id_matches = isset( $item['id'] ) && $item['id'] === $configured_id;
+            } else {
+                $id_matches = ! isset( $item['id'] ) || empty( $item['id'] );
+            }
+
+            if ( $id_matches ) {
+                return isset( $item['cache_by_role'] ) && (bool) $item['cache_by_role'];
+            }
         }
     }
 

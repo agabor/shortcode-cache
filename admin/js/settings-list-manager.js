@@ -12,7 +12,7 @@
             addShortcode();
         });
 
-        $(document).on('keypress', '.shortcode-cache-new-name', function (e) {
+        $(document).on('keypress', '.shortcode-cache-new-name, .shortcode-cache-new-id', function (e) {
             if (e.which === 13) {
                 e.preventDefault();
                 addShortcode();
@@ -22,7 +22,10 @@
         $(document).on('click', '.shortcode-cache-delete-btn', function (e) {
             e.preventDefault();
             const index = $(this).data('index');
-            deleteShortcode(index);
+            const row = $(this).closest('tr');
+            const name = row.find('.shortcode-cache-item-name').text();
+            const id = row.find('.shortcode-cache-item-id').text();
+            deleteShortcode(index, name, id);
         });
 
         $(document).on('change', '.shortcode-cache-role-checkbox', function (e) {
@@ -74,7 +77,9 @@
 
     function addShortcode() {
         const nameInput = $('.shortcode-cache-new-name');
+        const idInput = $('.shortcode-cache-new-id');
         const shortcodeName = nameInput.val().trim();
+        const shortcodeId = idInput.val().trim();
 
         if (!shortcodeName) {
             alert('Please enter a shortcode name');
@@ -91,6 +96,7 @@
             data: {
                 action: 'shortcode_cache_add',
                 shortcode_name: shortcodeName,
+                shortcode_id: shortcodeId,
             },
             success: function (response) {
                 if (response.success) {
@@ -109,8 +115,16 @@
         });
     }
 
-    function deleteShortcode(index) {
-        if (!confirm('Are you sure you want to delete this shortcode? This action cannot be undone.')) {
+    function deleteShortcode(index, name, id) {
+        let confirmMessage = 'Are you sure you want to delete this shortcode? This action cannot be undone.';
+        
+        if (id !== '—') {
+            confirmMessage = 'Delete shortcode "' + escapeHtml(name) + '" with ID "' + escapeHtml(id) + '"? This action cannot be undone.';
+        } else {
+            confirmMessage = 'Delete shortcode "' + escapeHtml(name) + '"? This action cannot be undone.';
+        }
+
+        if (!confirm(confirmMessage)) {
             return;
         }
 

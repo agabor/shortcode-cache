@@ -52,37 +52,6 @@ function shortcode_cache_get_detected_shortcodes() {
     return $detected;
 }
 
-function shortcode_cache_detect_current_page_shortcodes() {
-    if ( ! shortcode_cache_is_monitored_page() ) {
-        return;
-    }
-
-    global $post;
-
-    if ( ! $post || empty( $post->post_content ) ) {
-        return;
-    }
-
-    $content = $post->post_content;
-    $detected_shortcodes = array();
-
-    $shortcode_pattern = get_shortcode_regex();
-    preg_match_all( "/$shortcode_pattern/", $content, $matches );
-
-    if ( ! empty( $matches[2] ) ) {
-        foreach ( $matches[2] as $shortcode ) {
-            if ( ! isset( $detected_shortcodes[ $shortcode ] ) ) {
-                $detected_shortcodes[ $shortcode ] = 0;
-            }
-            $detected_shortcodes[ $shortcode ]++;
-        }
-    }
-
-    if ( ! empty( $detected_shortcodes ) ) {
-        set_transient( 'shortcode_cache_detected_shortcodes', $detected_shortcodes, WEEK_IN_SECONDS );
-    }
-}
-
 function shortcode_cache_clear_detected_shortcodes() {
     delete_transient( 'shortcode_cache_detected_shortcodes' );
 }

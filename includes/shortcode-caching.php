@@ -35,6 +35,21 @@ function shortcode_cache_wrap_shortcode_with_cache( $shortcode_name ) {
     };
 }
 
+function shortcode_cache_wrap_shortcode_for_detection( $shortcode_name ) {
+    global $shortcode_tags;
+
+    if ( ! isset( $shortcode_tags[ $shortcode_name ] ) ) {
+        return;
+    }
+
+    $original_callback = $shortcode_tags[ $shortcode_name ];
+
+    $shortcode_tags[ $shortcode_name ] = function( $atts ) use ( $original_callback, $shortcode_name ) {
+        shortcode_cache_track_shortcode_execution( $shortcode_name );
+        return call_user_func( $original_callback, $atts );
+    };
+}
+
 function shortcode_cache_should_use_cache( $shortcode_name ) {
     $config = get_option( 'shortcode_cache_config', array() );
 
@@ -126,4 +141,24 @@ function shortcode_cache_track_cached_item( $cache_key, $shortcode_name, $atts )
     );
 
     set_transient( 'shortcode_cache_items', $cached_items, DAY_IN_SECONDS );
+}
+
+function shortcode_cache_track_shortcode_execution( $shortcode_name ) {
+    $detected_shortcodes = get_transient( 'shortcode_cache_detected_shortcodes' );
+
+    if ( false === $detected_shortcodes ) {
+        $detected_shortcodes = array();
+    }
+
+    if ( ! is_array( $detected_shortcodes ) ) {
+        $detected_shortcodes = array();
+    }
+
+    if ( ! isset( $detected_shortcodes[ $shortcode_name ] ) ) {
+        $detected_shortcodes[ $shortcode_name ] = 0;
+    }
+
+    $detected_shortcodes[ $shortcode_name ]++;
+
+    set_transient( 'shortcode_cache_detected_shortcodes', $detected_shortcodes, WEEK_IN_SECONDS );
 }

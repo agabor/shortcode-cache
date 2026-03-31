@@ -2,7 +2,7 @@
 /**
  * Plugin Name: Shortcode Cache
  * Description: Cache rendered HTML for specific shortcodes
- * Version: 1.1.3
+ * Version: 1.1.4
  * Author: Gabor Angyal
  * Author URI: https://webshop.tech
  * License: GPL v2 or later
@@ -35,7 +35,7 @@ add_action( 'wp_ajax_shortcode_cache_add', 'shortcode_cache_handle_add_shortcode
 add_action( 'wp_ajax_shortcode_cache_delete', 'shortcode_cache_handle_delete_shortcode' );
 add_action( 'wp_ajax_shortcode_cache_update_roles', 'shortcode_cache_handle_update_shortcode_roles' );
 add_action( 'wp_ajax_shortcode_cache_get_roles', 'shortcode_cache_handle_get_available_roles' );
-add_action( 'wp', 'shortcode_cache_detect_current_page_shortcodes', 999 );
+add_action( 'wp', 'shortcode_cache_setup_detection', 999 );
 
 function shortcode_cache_register_admin_menu() {
     $hook_suffix = add_options_page(
@@ -54,7 +54,7 @@ function shortcode_cache_enqueue_admin_scripts() {
         'shortcode-cache-manager',
         SHORTCODE_CACHE_URL . 'admin/js/cache-manager.js',
         array( 'jquery' ),
-        '1.1.3',
+        '1.1.4',
         true
     );
 
@@ -62,7 +62,7 @@ function shortcode_cache_enqueue_admin_scripts() {
         'shortcode-cache-settings-manager',
         SHORTCODE_CACHE_URL . 'admin/js/settings-list-manager.js',
         array( 'jquery' ),
-        '1.1.3',
+        '1.1.4',
         true
     );
 
@@ -70,7 +70,7 @@ function shortcode_cache_enqueue_admin_scripts() {
         'shortcode-cache-settings-manager',
         SHORTCODE_CACHE_URL . 'admin/css/settings-manager.css',
         array(),
-        '1.1.3'
+        '1.1.4'
     );
 
     wp_localize_script(
@@ -129,5 +129,17 @@ function shortcode_cache_initialize_shortcode_caching() {
         if ( isset( $shortcode_tags[ $shortcode_name ] ) ) {
             shortcode_cache_wrap_shortcode_with_cache( $shortcode_name );
         }
+    }
+}
+
+function shortcode_cache_setup_detection() {
+    if ( ! shortcode_cache_is_monitored_page() ) {
+        return;
+    }
+
+    global $shortcode_tags;
+
+    foreach ( $shortcode_tags as $shortcode_name => $callback ) {
+        shortcode_cache_wrap_shortcode_for_detection( $shortcode_name );
     }
 }

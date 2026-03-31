@@ -34,3 +34,19 @@ function shortcode_cache_is_global_role_caching_enabled() {
     $allowed_roles = shortcode_cache_get_global_allowed_roles();
     return ! empty( $allowed_roles );
 }
+
+function shortcode_cache_is_role_caching_enabled_for_shortcode( $shortcode_name ) {
+    $config = get_option( 'shortcode_cache_config', array() );
+
+    if ( ! is_array( $config ) ) {
+        return false;
+    }
+
+    foreach ( $config as $item ) {
+        if ( isset( $item['name'] ) && $item['name'] === $shortcode_name ) {
+            return isset( $item['cache_by_role'] ) && (bool) $item['cache_by_role'];
+        }
+    }
+
+    return false;
+}

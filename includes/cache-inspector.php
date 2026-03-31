@@ -28,18 +28,23 @@ function shortcode_cache_get_all_cached_items() {
 
 function shortcode_cache_extract_parameters_from_item( $item_data ) {
     $parameters = isset( $item_data['parameters'] ) ? $item_data['parameters'] : array();
+    $parts = array();
 
-    if ( empty( $parameters ) ) {
+    if ( ! empty( $parameters ) ) {
+        foreach ( $parameters as $key => $value ) {
+            $parts[] = sprintf( '%s=%s', esc_html( $key ), esc_html( $value ) );
+        }
+    }
+
+    if ( isset( $item_data['cached_for_role'] ) ) {
+        $parts[] = sprintf( 'role=%s', esc_html( $item_data['cached_for_role'] ) );
+    }
+
+    if ( empty( $parts ) ) {
         return '—';
     }
 
-    $param_strings = array();
-
-    foreach ( $parameters as $key => $value ) {
-        $param_strings[] = sprintf( '%s=%s', esc_html( $key ), esc_html( $value ) );
-    }
-
-    return implode( ', ', $param_strings );
+    return implode( ', ', $parts );
 }
 
 function shortcode_cache_clear_specific_cache( $cache_key ) {

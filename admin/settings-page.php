@@ -112,6 +112,7 @@ $all_roles = shortcode_cache_get_all_roles();
             <thead>
                 <tr>
                     <th scope="col"><?php esc_html_e( 'Shortcode Name', 'shortcode-cache' ); ?></th>
+                    <th scope="col" class="shortcode-cache-role-column"><?php esc_html_e( 'Cache by Role', 'shortcode-cache' ); ?></th>
                     <th scope="col"><?php esc_html_e( 'Action', 'shortcode-cache' ); ?></th>
                 </tr>
             </thead>
@@ -123,6 +124,17 @@ $all_roles = shortcode_cache_get_all_roles();
                                 <?php echo esc_html( $item['name'] ); ?>
                             </span>
                             <input type="hidden" class="shortcode-cache-item-index" value="<?php echo esc_attr( $index ); ?>" />
+                        </td>
+                        <td class="shortcode-cache-role-column">
+                            <label class="shortcode-cache-role-toggle">
+                                <input
+                                    type="checkbox"
+                                    class="shortcode-cache-role-checkbox"
+                                    data-index="<?php echo esc_attr( $index ); ?>"
+                                    <?php checked( isset( $item['cache_by_role'] ) && $item['cache_by_role'] ); ?>
+                                />
+                                <span class="shortcode-cache-toggle-switch"></span>
+                            </label>
                         </td>
                         <td>
                             <button

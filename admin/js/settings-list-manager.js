@@ -25,6 +25,14 @@
             deleteShortcode(index);
         });
 
+        $(document).on('change', '.shortcode-cache-role-checkbox', function (e) {
+            if ($(this).data('index') !== undefined) {
+                const index = $(this).data('index');
+                const isChecked = $(this).prop('checked');
+                toggleShortcodeRoleCaching(index, isChecked);
+            }
+        });
+
         $(document).on('click', '.shortcode-cache-global-roles-btn', function (e) {
             e.preventDefault();
             openGlobalRoleSelectionDialog();
@@ -122,6 +130,28 @@
             },
             error: function () {
                 alert('An error occurred while deleting the shortcode.');
+            },
+        });
+    }
+
+    function toggleShortcodeRoleCaching(index, isChecked) {
+        $.ajax({
+            url: shortcodeCacheData.ajaxUrl,
+            type: 'POST',
+            data: {
+                action: 'shortcode_cache_update_role_caching',
+                index: index,
+                cache_by_role: isChecked ? 1 : 0,
+            },
+            success: function (response) {
+                if (!response.success) {
+                    alert(response.data.message);
+                    location.reload();
+                }
+            },
+            error: function () {
+                alert('An error occurred while updating role caching setting.');
+                location.reload();
             },
         });
     }

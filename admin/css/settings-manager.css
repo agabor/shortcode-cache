@@ -136,3 +136,60 @@
 .shortcode-cache-global-roles-display {
     line-height: 1.6;
 }
+
+.shortcode-cache-role-column {
+    width: 150px;
+    text-align: center;
+}
+
+.shortcode-cache-role-toggle {
+    display: inline-flex;
+    align-items: center;
+    cursor: pointer;
+    position: relative;
+}
+
+.shortcode-cache-role-toggle input[type="checkbox"] {
+    appearance: none;
+    -webkit-appearance: none;
+    width: 0;
+    height: 0;
+    position: absolute;
+    opacity: 0;
+}
+
+.shortcode-cache-toggle-switch {
+    display: inline-block;
+    width: 44px;
+    height: 24px;
+    background-color: #ccc;
+    border-radius: 12px;
+    position: relative;
+    transition: background-color 0.3s;
+}
+
+.shortcode-cache-toggle-switch::after {
+    content: '';
+    position: absolute;
+    width: 20px;
+    height: 20px;
+    background-color: white;
+    border-radius: 50%;
+    top: 2px;
+    left: 2px;
+    transition: left 0.3s;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+}
+
+.shortcode-cache-role-toggle input[type="checkbox"]:checked + .shortcode-cache-toggle-switch {
+    background-color: #0073aa;
+}
+
+.shortcode-cache-role-toggle input[type="checkbox"]:checked + .shortcode-cache-toggle-switch::after {
+    left: 22px;
+}
+
+.shortcode-cache-role-toggle input[type="checkbox"]:disabled + .shortcode-cache-toggle-switch {
+    opacity: 0.5;
+    cursor: not-allowed;
+}

@@ -30,6 +30,12 @@ function shortcode_cache_sanitize_shortcode_config( $value ) {
             $sanitized_item['name'] = sanitize_text_field( $item['name'] );
         }
 
+        if ( isset( $item['cache_by_role'] ) ) {
+            $sanitized_item['cache_by_role'] = (bool) $item['cache_by_role'];
+        } else {
+            $sanitized_item['cache_by_role'] = false;
+        }
+
         if ( ! empty( $sanitized_item['name'] ) ) {
             $sanitized_config[] = $sanitized_item;
         }

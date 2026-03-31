@@ -1,10 +1,10 @@
 #!/bin/bash
 
-rm shortcode-cache.zip
+rm shortcode-detect.zip
 
 cd ..
 
-zip -r shortcode-cache.zip shortcode-cache --exclude="shortcode-cache/.git/*" --exclude="shortcode-cache/.idea/*" --exclude="shortcode-cache/.gitignore" --exclude="shortcode-cache/*.sh"
-mv shortcode-cache.zip shortcode-cache
+zip -r shortcode-detect.zip shortcode-detect --exclude="shortcode-detect/.git/*" --exclude="shortcode-detect/.idea/*" --exclude="shortcode-detect/.gitignore" --exclude="shortcode-detect/*.sh"
+mv shortcode-detect.zip shortcode-detect
 
 cd -

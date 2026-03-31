@@ -4,15 +4,15 @@ if ( ! defined( 'ABSPATH' ) ) {
     exit;
 }
 
-function shortcode_cache_get_monitored_url() {
-    return get_option( 'shortcode_cache_monitored_url', '' );
+function shortcode_detect_get_monitored_url() {
+    return get_option( 'shortcode_detect_monitored_url', '' );
 }
 
-function shortcode_cache_set_monitored_url( $url ) {
+function shortcode_detect_set_monitored_url( $url ) {
     $url = trim( $url );
 
     if ( empty( $url ) ) {
-        delete_option( 'shortcode_cache_monitored_url' );
+        delete_option( 'shortcode_detect_monitored_url' );
         return true;
     }
 
@@ -20,16 +20,16 @@ function shortcode_cache_set_monitored_url( $url ) {
         return false;
     }
 
-    update_option( 'shortcode_cache_monitored_url', $url );
+    update_option( 'shortcode_detect_monitored_url', $url );
     return true;
 }
 
-function shortcode_cache_is_monitored_page() {
+function shortcode_detect_is_monitored_page() {
     if ( is_admin() ) {
         return false;
     }
 
-    $monitored_url = shortcode_cache_get_monitored_url();
+    $monitored_url = shortcode_detect_get_monitored_url();
 
     if ( empty( $monitored_url ) ) {
         return false;
@@ -42,8 +42,8 @@ function shortcode_cache_is_monitored_page() {
     return $current_url === $monitored_url;
 }
 
-function shortcode_cache_get_detected_shortcodes() {
-    $detected = get_transient( 'shortcode_cache_detected_shortcodes' );
+function shortcode_detect_get_detected_shortcodes() {
+    $detected = get_transient( 'shortcode_detect_detected_shortcodes' );
 
     if ( false === $detected || ! is_array( $detected ) ) {
         return array();
@@ -53,6 +53,6 @@ function shortcode_cache_get_detected_shortcodes() {
 }
 
 
-function shortcode_cache_clear_detected_shortcodes() {
-    delete_transient( 'shortcode_cache_detected_shortcodes' );
+function shortcode_detect_clear_detected_shortcodes() {
+    delete_transient( 'shortcode_detect_detected_shortcodes' );
 }

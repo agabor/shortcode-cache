@@ -1,6 +1,6 @@
 (function ($) {
     $(document).ready(function () {
-        $(document).on('click', '.shortcode-cache-clear-detected-btn', function (e) {
+        $(document).on('click', '.shortcode-detect-clear-detected-btn', function (e) {
             e.preventDefault();
 
             const button = $(this);
@@ -16,7 +16,7 @@
                 url: shortcodeCacheData.ajaxUrl,
                 type: 'POST',
                 data: {
-                    action: 'shortcode_cache_clear_detected',
+                    action: 'shortcode_detect_clear_detected',
                 },
                 success: function (response) {
                     if (response.success) {

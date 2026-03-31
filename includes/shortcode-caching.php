@@ -14,6 +14,12 @@ function shortcode_cache_wrap_shortcode_with_cache( $shortcode_name ) {
     $original_callback = $shortcode_tags[ $shortcode_name ];
 
     $shortcode_tags[ $shortcode_name ] = function( $atts ) use ( $original_callback, $shortcode_name ) {
+        $should_use_cache = shortcode_cache_should_use_cache( $shortcode_name );
+
+        if ( ! $should_use_cache ) {
+            return call_user_func( $original_callback, $atts );
+        }
+
         $cache_key = shortcode_cache_generate_cache_key( $shortcode_name, $atts );
         $group     = 'shortcode_cache';
 
@@ -27,6 +33,48 @@ function shortcode_cache_wrap_shortcode_with_cache( $shortcode_name ) {
 
         return $output;
     };
+}
+
+function shortcode_cache_should_use_cache( $shortcode_name ) {
+    $config = get_option( 'shortcode_cache_config', array() );
+
+    if ( ! is_array( $config ) ) {
+        return true;
+    }
+
+    foreach ( $config as $item ) {
+        if ( ! isset( $item['name'] ) || $item['name'] !== $shortcode_name ) {
+            continue;
+        }
+
+        $allowed_roles = isset( $item['allowed_roles'] ) ? $item['allowed_roles'] : array();
+
+        if ( ! is_array( $allowed_roles ) ) {
+            $allowed_roles = array();
+        }
+
+        $current_user = wp_get_current_user();
+
+        if ( 0 === $current_user->ID ) {
+            return true;
+        }
+
+        if ( empty( $allowed_roles ) ) {
+            return true;
+        }
+
+        $user_roles = $current_user->roles;
+
+        foreach ( $user_roles as $user_role ) {
+            if ( in_array( $user_role, $allowed_roles, true ) ) {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
+    return true;
 }
 
 function shortcode_cache_generate_cache_key( $shortcode_name, $atts ) {

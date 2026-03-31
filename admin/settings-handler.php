@@ -35,6 +35,16 @@ function shortcode_cache_sanitize_shortcode_config( $value ) {
             $sanitized_item['role_based'] = false;
         }
 
+        if ( isset( $item['allowed_roles'] ) && is_array( $item['allowed_roles'] ) ) {
+            $allowed_roles = array();
+            foreach ( $item['allowed_roles'] as $role ) {
+                $allowed_roles[] = sanitize_text_field( $role );
+            }
+            $sanitized_item['allowed_roles'] = $allowed_roles;
+        } else {
+            $sanitized_item['allowed_roles'] = array();
+        }
+
         if ( ! empty( $sanitized_item['name'] ) ) {
             $sanitized_config[] = $sanitized_item;
         }

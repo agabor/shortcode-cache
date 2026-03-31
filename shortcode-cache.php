@@ -19,6 +19,7 @@ define( 'SHORTCODE_CACHE_DIR', plugin_dir_path( __FILE__ ) );
 define( 'SHORTCODE_CACHE_URL', plugin_dir_url( __FILE__ ) );
 
 require_once SHORTCODE_CACHE_DIR . 'includes/cache-operations.php';
+require_once SHORTCODE_CACHE_DIR . 'includes/role-utils.php';
 require_once SHORTCODE_CACHE_DIR . 'includes/shortcode-caching.php';
 require_once SHORTCODE_CACHE_DIR . 'includes/cache-inspector.php';
 require_once SHORTCODE_CACHE_DIR . 'includes/url-detection.php';
@@ -32,7 +33,8 @@ add_action( 'wp_ajax_shortcode_cache_clear', 'shortcode_cache_handle_clear_cache
 add_action( 'wp_ajax_shortcode_cache_clear_detected', 'shortcode_cache_handle_clear_detected_shortcodes' );
 add_action( 'wp_ajax_shortcode_cache_add', 'shortcode_cache_handle_add_shortcode' );
 add_action( 'wp_ajax_shortcode_cache_delete', 'shortcode_cache_handle_delete_shortcode' );
-add_action( 'wp_ajax_shortcode_cache_toggle_role', 'shortcode_cache_handle_toggle_role_based_caching' );
+add_action( 'wp_ajax_shortcode_cache_update_roles', 'shortcode_cache_handle_update_shortcode_roles' );
+add_action( 'wp_ajax_shortcode_cache_get_roles', 'shortcode_cache_handle_get_available_roles' );
 add_action( 'wp', 'shortcode_cache_detect_current_page_shortcodes', 999 );
 
 function shortcode_cache_register_admin_menu() {
@@ -62,6 +64,13 @@ function shortcode_cache_enqueue_admin_scripts() {
         array( 'jquery' ),
         '1.1.1',
         true
+    );
+
+    wp_enqueue_style(
+        'shortcode-cache-settings-manager',
+        SHORTCODE_CACHE_URL . 'admin/css/settings-manager.css',
+        array(),
+        '1.1.1'
     );
 
     wp_localize_script(

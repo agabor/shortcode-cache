@@ -1,0 +1,128 @@
+.shortcode-cache-modal {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-color: rgba(0, 0, 0, 0.5);
+    z-index: 9999;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.shortcode-cache-modal.hidden {
+    display: none;
+}
+
+.shortcode-cache-modal-content {
+    background-color: white;
+    border-radius: 4px;
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+    max-width: 500px;
+    width: 90%;
+    max-height: 80vh;
+    display: flex;
+    flex-direction: column;
+}
+
+.shortcode-cache-modal-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 15px 20px;
+    border-bottom: 1px solid #e0e0e0;
+}
+
+.shortcode-cache-modal-header h2 {
+    margin: 0;
+    font-size: 18px;
+}
+
+.shortcode-cache-modal-close {
+    background: none;
+    border: none;
+    font-size: 24px;
+    cursor: pointer;
+    padding: 0;
+    width: 30px;
+    height: 30px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.shortcode-cache-modal-close:hover {
+    color: #d63638;
+}
+
+.shortcode-cache-modal-body {
+    padding: 20px;
+    overflow-y: auto;
+    flex: 1;
+}
+
+.shortcode-cache-modal-body .description {
+    margin-bottom: 15px;
+    color: #666;
+    font-size: 13px;
+}
+
+.shortcode-cache-roles-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+    gap: 12px;
+}
+
+.shortcode-cache-role-label {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    cursor: pointer;
+    padding: 8px;
+    border-radius: 4px;
+    transition: background-color 0.2s;
+}
+
+.shortcode-cache-role-label:hover {
+    background-color: #f5f5f5;
+}
+
+.shortcode-cache-role-label input[type="checkbox"] {
+    cursor: pointer;
+}
+
+.shortcode-cache-role-label span {
+    font-size: 13px;
+}
+
+.shortcode-cache-modal-footer {
+    display: flex;
+    justify-content: flex-end;
+    gap: 10px;
+    padding: 15px 20px;
+    border-top: 1px solid #e0e0e0;
+}
+
+.shortcode-cache-role-badge {
+    display: inline-block;
+    background-color: #e7f3ff;
+    border: 1px solid #0073aa;
+    border-radius: 3px;
+    padding: 4px 8px;
+    font-size: 12px;
+    color: #0073aa;
+    margin-right: 5px;
+    margin-bottom: 5px;
+}
+
+.shortcode-cache-roles-all {
+    display: inline-block;
+    color: #666;
+    font-style: italic;
+    font-size: 13px;
+}
+
+.shortcode-cache-roles-display {
+    line-height: 1.6;
+}

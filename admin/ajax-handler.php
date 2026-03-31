@@ -70,6 +70,7 @@ function shortcode_cache_handle_add_shortcode() {
     $new_item = array(
         'name' => $shortcode_name,
         'role_based' => false,
+        'allowed_roles' => array(),
     );
 
     $config[] = $new_item;
@@ -107,13 +108,13 @@ function shortcode_cache_handle_delete_shortcode() {
     wp_send_json_success( array( 'message' => __( 'Shortcode deleted successfully', 'shortcode-cache' ) ) );
 }
 
-function shortcode_cache_handle_toggle_role_based_caching() {
+function shortcode_cache_handle_update_shortcode_roles() {
     if ( ! current_user_can( 'manage_options' ) ) {
         wp_send_json_error( array( 'message' => __( 'Insufficient permissions', 'shortcode-cache' ) ) );
     }
 
     $index = isset( $_POST['index'] ) ? intval( $_POST['index'] ) : -1;
-    $enabled = isset( $_POST['enabled'] ) ? (bool) $_POST['enabled'] : false;
+    $selected_roles = isset( $_POST['selected_roles'] ) ? (array) $_POST['selected_roles'] : array();
 
     if ( $index < 0 ) {
         wp_send_json_error( array( 'message' => __( 'Invalid index', 'shortcode-cache' ) ) );
@@ -125,9 +126,29 @@ function shortcode_cache_handle_toggle_role_based_caching() {
         wp_send_json_error( array( 'message' => __( 'Shortcode not found', 'shortcode-cache' ) ) );
     }
 
-    $config[ $index ]['role_based'] = $enabled;
+    $available_roles = shortcode_cache_get_all_roles();
+    $sanitized_roles = array();
+
+    foreach ( $selected_roles as $role ) {
+        $role = sanitize_text_field( $role );
+        if ( isset( $available_roles[ $role ] ) ) {
+            $sanitized_roles[] = $role;
+        }
+    }
+
+    $config[ $index ]['allowed_roles'] = $sanitized_roles;
 
     update_option( 'shortcode_cache_config', $config );
 
-    wp_send_json_success( array( 'message' => __( 'Setting updated successfully', 'shortcode-cache' ) ) );
+    wp_send_json_success( array( 'message' => __( 'Roles updated successfully', 'shortcode-cache' ) ) );
+}
+
+function shortcode_cache_handle_get_available_roles() {
+    if ( ! current_user_can( 'manage_options' ) ) {
+        wp_send_json_error( array( 'message' => __( 'Insufficient permissions', 'shortcode-cache' ) ) );
+    }
+
+    $all_roles = shortcode_cache_get_all_roles();
+
+    wp_send_json_success( array( 'roles' => $all_roles ) );
 }

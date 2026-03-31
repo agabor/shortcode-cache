@@ -9,6 +9,7 @@ $monitored_url = shortcode_cache_get_monitored_url();
 $show_success = isset( $_GET['settings-updated'] ) && $_GET['settings-updated'];
 $cached_items = shortcode_cache_get_all_cached_items();
 $detected_shortcodes = shortcode_cache_get_detected_shortcodes();
+$all_roles = shortcode_cache_get_all_roles();
 ?>
 
 <div class="wrap">
@@ -84,12 +85,16 @@ $detected_shortcodes = shortcode_cache_get_detected_shortcodes();
             <thead>
                 <tr>
                     <th scope="col"><?php esc_html_e( 'Shortcode Name', 'shortcode-cache' ); ?></th>
-                    <th scope="col"><?php esc_html_e( 'Cache by User Role', 'shortcode-cache' ); ?></th>
+                    <th scope="col"><?php esc_html_e( 'Cached for Roles', 'shortcode-cache' ); ?></th>
                     <th scope="col"><?php esc_html_e( 'Action', 'shortcode-cache' ); ?></th>
                 </tr>
             </thead>
             <tbody>
                 <?php foreach ( $config as $index => $item ) : ?>
+                    <?php
+                    $allowed_roles = isset( $item['allowed_roles'] ) ? $item['allowed_roles'] : array();
+                    $role_display = shortcode_cache_format_allowed_roles_display( $allowed_roles, $all_roles );
+                    ?>
                     <tr class="shortcode-cache-item-row">
                         <td>
                             <span class="shortcode-cache-item-name">
@@ -98,17 +103,18 @@ $detected_shortcodes = shortcode_cache_get_detected_shortcodes();
                             <input type="hidden" class="shortcode-cache-item-index" value="<?php echo esc_attr( $index ); ?>" />
                         </td>
                         <td>
-                            <label style="display: flex; align-items: center; gap: 5px;">
-                                <input
-                                    type="checkbox"
-                                    class="shortcode-cache-role-toggle"
-                                    <?php checked( isset( $item['role_based'] ) ? $item['role_based'] : false ); ?>
-                                    data-index="<?php echo esc_attr( $index ); ?>"
-                                />
-                                <?php esc_html_e( 'Include User Role in Cache Key', 'shortcode-cache' ); ?>
-                            </label>
+                            <div class="shortcode-cache-roles-display" data-index="<?php echo esc_attr( $index ); ?>">
+                                <?php echo wp_kses_post( $role_display ); ?>
+                            </div>
                         </td>
                         <td>
+                            <button
+                                type="button"
+                                class="button button-small shortcode-cache-roles-btn"
+                                data-index="<?php echo esc_attr( $index ); ?>"
+                            >
+                                <?php esc_html_e( 'Manage Roles', 'shortcode-cache' ); ?>
+                            </button>
                             <button
                                 type="button"
                                 class="button button-small button-danger shortcode-cache-delete-btn"
@@ -201,3 +207,63 @@ $detected_shortcodes = shortcode_cache_get_detected_shortcodes();
         </table>
     <?php endif; ?>
 </div>
+
+<div id="shortcode-cache-role-modal" class="shortcode-cache-modal" style="display: none;">
+    <div class="shortcode-cache-modal-content">
+        <div class="shortcode-cache-modal-header">
+            <h2><?php esc_html_e( 'Select Roles for Cache', 'shortcode-cache' ); ?></h2>
+            <button type="button" class="shortcode-cache-modal-close">&times;</button>
+        </div>
+        <div class="shortcode-cache-modal-body">
+            <p class="description">
+                <?php esc_html_e( 'Guest users always use cache by default. Select which authenticated user roles should use cache for this shortcode.', 'shortcode-cache' ); ?>
+            </p>
+            <div class="shortcode-cache-roles-grid">
+                <?php foreach ( $all_roles as $role_slug => $role_name ) : ?>
+                    <label class="shortcode-cache-role-label">
+                        <input
+                            type="checkbox"
+                            class="shortcode-cache-role-checkbox"
+                            value="<?php echo esc_attr( $role_slug ); ?>"
+                        />
+                        <span><?php echo esc_html( $role_name ); ?></span>
+                    </label>
+                <?php endforeach; ?>
+            </div>
+        </div>
+        <div class="shortcode-cache-modal-footer">
+            <button type="button" class="button shortcode-cache-modal-cancel">
+                <?php esc_html_e( 'Cancel', 'shortcode-cache' ); ?>
+            </button>
+            <button type="button" class="button button-primary shortcode-cache-modal-save">
+                <?php esc_html_e( 'Save Roles', 'shortcode-cache' ); ?>
+            </button>
+        </div>
+    </div>
+</div>
+
+<?php
+function shortcode_cache_format_allowed_roles_display( $allowed_roles, $all_roles ) {
+    if ( empty( $allowed_roles ) ) {
+        return '<span class="shortcode-cache-roles-all">All authenticated roles</span>';
+    }
+
+    $role_names = array();
+    foreach ( $allowed_roles as $role_slug ) {
+        if ( isset( $all_roles[ $role_slug ] ) ) {
+            $role_names[] = $all_roles[ $role_slug ];
+        }
+    }
+
+    if ( empty( $role_names ) ) {
+        return '<span class="shortcode-cache-roles-all">All authenticated roles</span>';
+    }
+
+    $output = '';
+    foreach ( $role_names as $role_name ) {
+        $output .= '<span class="shortcode-cache-role-badge">' . esc_html( $role_name ) . '</span>';
+    }
+
+    return $output;
+}
+?>

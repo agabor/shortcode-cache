@@ -11,6 +11,11 @@ $show_success = isset( $_GET['settings-updated'] ) && $_GET['settings-updated'];
 $cached_items = shortcode_cache_get_all_cached_items();
 $detected_shortcodes = shortcode_cache_get_detected_shortcodes();
 $all_roles = shortcode_cache_get_all_roles();
+
+$parsed_detected = shortcode_cache_parse_detected_shortcodes( $detected_shortcodes );
+usort( $parsed_detected, function( $a, $b ) {
+    return strcmp( $a['name'], $b['name'] );
+} );
 ?>
 
 <div class="wrap">
@@ -172,7 +177,7 @@ $all_roles = shortcode_cache_get_all_roles();
 
     <h2><?php esc_html_e( 'Detected Shortcodes', 'shortcode-cache' ); ?></h2>
 
-    <?php if ( empty( $detected_shortcodes ) ) : ?>
+    <?php if ( empty( $parsed_detected ) ) : ?>
         <p><?php esc_html_e( 'No shortcodes detected yet. Visit the monitored URL to detect shortcodes.', 'shortcode-cache' ); ?></p>
     <?php else : ?>
         <div class="shortcode-cache-actions" style="margin-bottom: 15px;">
@@ -187,15 +192,17 @@ $all_roles = shortcode_cache_get_all_roles();
         <table class="wp-list-table widefat striped">
             <thead>
                 <tr>
-                    <th scope="col"><?php esc_html_e( 'Shortcode', 'shortcode-cache' ); ?></th>
+                    <th scope="col"><?php esc_html_e( 'Shortcode Name', 'shortcode-cache' ); ?></th>
+                    <th scope="col"><?php esc_html_e( 'ID', 'shortcode-cache' ); ?></th>
                     <th scope="col"><?php esc_html_e( 'Usage Count', 'shortcode-cache' ); ?></th>
                 </tr>
             </thead>
             <tbody>
-                <?php foreach ( $detected_shortcodes as $shortcode_key => $count ) : ?>
+                <?php foreach ( $parsed_detected as $shortcode_data ) : ?>
                     <tr>
-                        <td><?php echo esc_html( shortcode_cache_format_detected_shortcode_name( $shortcode_key ) ); ?></td>
-                        <td><?php echo esc_html( $count ); ?></td>
+                        <td><?php echo esc_html( $shortcode_data['name'] ); ?></td>
+                        <td><?php echo ! empty( $shortcode_data['id'] ) ? esc_html( $shortcode_data['id'] ) : '—'; ?></td>
+                        <td><?php echo esc_html( $shortcode_data['count'] ); ?></td>
                     </tr>
                 <?php endforeach; ?>
             </tbody>
@@ -306,5 +313,28 @@ function shortcode_cache_format_global_roles_display( $allowed_roles, $all_roles
     }
 
     return $output;
+}
+
+function shortcode_cache_parse_detected_shortcodes( $detected_shortcodes ) {
+    $parsed = array();
+
+    foreach ( $detected_shortcodes as $key => $count ) {
+        if ( strpos( $key, '::' ) === false ) {
+            $parsed[] = array(
+                'name' => $key,
+                'id' => '',
+                'count' => $count,
+            );
+        } else {
+            list( $name, $id ) = explode( '::', $key, 2 );
+            $parsed[] = array(
+                'name' => $name,
+                'id' => $id,
+                'count' => $count,
+            );
+        }
+    }
+
+    return $parsed;
 }
 ?>

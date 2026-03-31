@@ -66,10 +66,11 @@ function shortcode_cache_detect_current_page_shortcodes() {
     $content = $post->post_content;
     $detected_shortcodes = array();
 
-    preg_match_all( '/\[([a-zA-Z0-9_-]+)(?:\s[^\]]*?)?\]/s', $content, $matches );
+    $shortcode_pattern = get_shortcode_regex();
+    preg_match_all( "/$shortcode_pattern/", $content, $matches );
 
-    if ( ! empty( $matches[1] ) ) {
-        foreach ( $matches[1] as $shortcode ) {
+    if ( ! empty( $matches[2] ) ) {
+        foreach ( $matches[2] as $shortcode ) {
             if ( ! isset( $detected_shortcodes[ $shortcode ] ) ) {
                 $detected_shortcodes[ $shortcode ] = 0;
             }

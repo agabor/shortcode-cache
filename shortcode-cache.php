@@ -33,7 +33,7 @@ add_action( 'wp_ajax_shortcode_cache_clear', 'shortcode_cache_handle_clear_cache
 add_action( 'wp_ajax_shortcode_cache_clear_detected', 'shortcode_cache_handle_clear_detected_shortcodes' );
 add_action( 'wp_ajax_shortcode_cache_add', 'shortcode_cache_handle_add_shortcode' );
 add_action( 'wp_ajax_shortcode_cache_delete', 'shortcode_cache_handle_delete_shortcode' );
-add_action( 'wp_ajax_shortcode_cache_update_roles', 'shortcode_cache_handle_update_shortcode_roles' );
+add_action( 'wp_ajax_shortcode_cache_update_global_roles', 'shortcode_cache_handle_update_global_roles' );
 add_action( 'wp_ajax_shortcode_cache_get_roles', 'shortcode_cache_handle_get_available_roles' );
 add_action( 'wp', 'shortcode_cache_setup_detection', 999 );
 
@@ -91,6 +91,11 @@ function shortcode_cache_register_settings() {
     register_setting(
         'shortcode_cache_group',
         'shortcode_cache_monitored_url'
+    );
+
+    register_setting(
+        'shortcode_cache_group',
+        'shortcode_cache_global_roles'
     );
 }
 

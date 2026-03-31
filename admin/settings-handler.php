@@ -6,6 +6,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 
 add_filter( 'sanitize_option_shortcode_cache_config', 'shortcode_cache_sanitize_shortcode_config' );
 add_filter( 'sanitize_option_shortcode_cache_monitored_url', 'shortcode_cache_sanitize_monitored_url' );
+add_filter( 'sanitize_option_shortcode_cache_global_roles', 'shortcode_cache_sanitize_global_roles' );
 
 function shortcode_cache_sanitize_shortcode_config( $value ) {
     if ( empty( $value ) ) {
@@ -27,22 +28,6 @@ function shortcode_cache_sanitize_shortcode_config( $value ) {
 
         if ( isset( $item['name'] ) ) {
             $sanitized_item['name'] = sanitize_text_field( $item['name'] );
-        }
-
-        if ( isset( $item['role_based'] ) ) {
-            $sanitized_item['role_based'] = (bool) $item['role_based'];
-        } else {
-            $sanitized_item['role_based'] = false;
-        }
-
-        if ( isset( $item['allowed_roles'] ) && is_array( $item['allowed_roles'] ) ) {
-            $allowed_roles = array();
-            foreach ( $item['allowed_roles'] as $role ) {
-                $allowed_roles[] = sanitize_text_field( $role );
-            }
-            $sanitized_item['allowed_roles'] = $allowed_roles;
-        } else {
-            $sanitized_item['allowed_roles'] = array();
         }
 
         if ( ! empty( $sanitized_item['name'] ) ) {
@@ -70,4 +55,26 @@ function shortcode_cache_sanitize_monitored_url( $value ) {
     }
 
     return esc_url_raw( $value );
+}
+
+function shortcode_cache_sanitize_global_roles( $value ) {
+    if ( empty( $value ) ) {
+        return array();
+    }
+
+    if ( ! is_array( $value ) ) {
+        return array();
+    }
+
+    $available_roles = shortcode_cache_get_all_roles();
+    $sanitized_roles = array();
+
+    foreach ( $value as $role ) {
+        $role = sanitize_text_field( $role );
+        if ( isset( $available_roles[ $role ] ) ) {
+            $sanitized_roles[] = $role;
+        }
+    }
+
+    return $sanitized_roles;
 }

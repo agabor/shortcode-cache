@@ -1,5 +1,4 @@
 (function ($) {
-    let currentModalIndex = -1;
     let allAvailableRoles = {};
 
     $(document).ready(function () {
@@ -26,10 +25,9 @@
             deleteShortcode(index);
         });
 
-        $(document).on('click', '.shortcode-cache-roles-btn', function (e) {
+        $(document).on('click', '.shortcode-cache-global-roles-btn', function (e) {
             e.preventDefault();
-            const index = $(this).data('index');
-            openRoleSelectionDialog(index);
+            openGlobalRoleSelectionDialog();
         });
 
         $(document).on('click', '.shortcode-cache-modal-close', function () {
@@ -41,7 +39,7 @@
         });
 
         $(document).on('click', '.shortcode-cache-modal-save', function () {
-            saveSelectedRoles();
+            saveGlobalSelectedRoles();
         });
 
         $(document).on('click', '#shortcode-cache-role-modal', function (e) {
@@ -128,16 +126,13 @@
         });
     }
 
-    function openRoleSelectionDialog(index) {
-        currentModalIndex = index;
-
+    function openGlobalRoleSelectionDialog() {
         const modal = $('#shortcode-cache-role-modal');
         const checkboxes = modal.find('.shortcode-cache-role-checkbox');
-        
+
         checkboxes.prop('checked', false);
 
-        const row = $('.shortcode-cache-item-row').eq(index);
-        const display = row.find('.shortcode-cache-roles-display');
+        const display = $('.shortcode-cache-global-roles-display');
         const badges = display.find('.shortcode-cache-role-badge');
 
         const selectedRoles = [];
@@ -162,15 +157,9 @@
 
     function closeRoleSelectionDialog() {
         $('#shortcode-cache-role-modal').hide();
-        currentModalIndex = -1;
     }
 
-    function saveSelectedRoles() {
-        if (currentModalIndex < 0) {
-            closeRoleSelectionDialog();
-            return;
-        }
-
+    function saveGlobalSelectedRoles() {
         const modal = $('#shortcode-cache-role-modal');
         const selectedRoles = [];
 
@@ -182,13 +171,12 @@
             url: shortcodeCacheData.ajaxUrl,
             type: 'POST',
             data: {
-                action: 'shortcode_cache_update_roles',
-                index: currentModalIndex,
+                action: 'shortcode_cache_update_global_roles',
                 selected_roles: selectedRoles,
             },
             success: function (response) {
                 if (response.success) {
-                    updateRolesDisplay(currentModalIndex, selectedRoles);
+                    updateGlobalRolesDisplay(selectedRoles);
                     closeRoleSelectionDialog();
                 } else {
                     alert(response.data.message);
@@ -200,9 +188,8 @@
         });
     }
 
-    function updateRolesDisplay(index, selectedRoles) {
-        const row = $('.shortcode-cache-item-row').eq(index);
-        const display = row.find('.shortcode-cache-roles-display');
+    function updateGlobalRolesDisplay(selectedRoles) {
+        const display = $('.shortcode-cache-global-roles-display');
 
         if (selectedRoles.length === 0) {
             display.html('<span class="shortcode-cache-roles-all">All authenticated roles</span>');

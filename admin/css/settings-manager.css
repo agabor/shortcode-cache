@@ -126,3 +126,13 @@
 .shortcode-cache-roles-display {
     line-height: 1.6;
 }
+
+.shortcode-cache-global-roles-section {
+    display: flex;
+    gap: 15px;
+    align-items: center;
+}
+
+.shortcode-cache-global-roles-display {
+    line-height: 1.6;
+}

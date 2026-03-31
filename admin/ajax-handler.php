@@ -43,3 +43,91 @@ function shortcode_cache_handle_clear_detected_shortcodes() {
 
     wp_send_json_success( array( 'message' => __( 'Detected shortcodes cleared successfully', 'shortcode-cache' ) ) );
 }
+
+function shortcode_cache_handle_add_shortcode() {
+    if ( ! current_user_can( 'manage_options' ) ) {
+        wp_send_json_error( array( 'message' => __( 'Insufficient permissions', 'shortcode-cache' ) ) );
+    }
+
+    $shortcode_name = isset( $_POST['shortcode_name'] ) ? sanitize_text_field( $_POST['shortcode_name'] ) : '';
+
+    if ( empty( $shortcode_name ) ) {
+        wp_send_json_error( array( 'message' => __( 'Shortcode name cannot be empty', 'shortcode-cache' ) ) );
+    }
+
+    $config = get_option( 'shortcode_cache_config', array() );
+
+    if ( ! is_array( $config ) ) {
+        $config = array();
+    }
+
+    foreach ( $config as $item ) {
+        if ( isset( $item['name'] ) && $item['name'] === $shortcode_name ) {
+            wp_send_json_error( array( 'message' => __( 'This shortcode is already in the list', 'shortcode-cache' ) ) );
+        }
+    }
+
+    $new_item = array(
+        'name' => $shortcode_name,
+        'role_based' => false,
+    );
+
+    $config[] = $new_item;
+
+    update_option( 'shortcode_cache_config', $config );
+
+    wp_send_json_success( array(
+        'message' => __( 'Shortcode added successfully', 'shortcode-cache' ),
+        'index' => count( $config ) - 1,
+    ) );
+}
+
+function shortcode_cache_handle_delete_shortcode() {
+    if ( ! current_user_can( 'manage_options' ) ) {
+        wp_send_json_error( array( 'message' => __( 'Insufficient permissions', 'shortcode-cache' ) ) );
+    }
+
+    $index = isset( $_POST['index'] ) ? intval( $_POST['index'] ) : -1;
+
+    if ( $index < 0 ) {
+        wp_send_json_error( array( 'message' => __( 'Invalid index', 'shortcode-cache' ) ) );
+    }
+
+    $config = get_option( 'shortcode_cache_config', array() );
+
+    if ( ! is_array( $config ) || ! isset( $config[ $index ] ) ) {
+        wp_send_json_error( array( 'message' => __( 'Shortcode not found', 'shortcode-cache' ) ) );
+    }
+
+    unset( $config[ $index ] );
+    $config = array_values( $config );
+
+    update_option( 'shortcode_cache_config', $config );
+
+    wp_send_json_success( array( 'message' => __( 'Shortcode deleted successfully', 'shortcode-cache' ) ) );
+}
+
+function shortcode_cache_handle_toggle_role_based_caching() {
+    if ( ! current_user_can( 'manage_options' ) ) {
+        wp_send_json_error( array( 'message' => __( 'Insufficient permissions', 'shortcode-cache' ) ) );
+    }
+
+    $index = isset( $_POST['index'] ) ? intval( $_POST['index'] ) : -1;
+    $enabled = isset( $_POST['enabled'] ) ? (bool) $_POST['enabled'] : false;
+
+    if ( $index < 0 ) {
+        wp_send_json_error( array( 'message' => __( 'Invalid index', 'shortcode-cache' ) ) );
+    }
+
+    $config = get_option( 'shortcode_cache_config', array() );
+
+    if ( ! is_array( $config ) || ! isset( $config[ $index ] ) ) {
+        wp_send_json_error( array( 'message' => __( 'Shortcode not found', 'shortcode-cache' ) ) );
+    }
+
+    $config[ $index ]['role_based'] = $enabled;
+
+    update_option( 'shortcode_cache_config', $config );
+
+    wp_send_json_success( array( 'message' => __( 'Setting updated successfully', 'shortcode-cache' ) ) );
+}

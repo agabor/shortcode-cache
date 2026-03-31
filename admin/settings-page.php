@@ -4,8 +4,7 @@ if ( ! defined( 'ABSPATH' ) ) {
     exit;
 }
 
-$shortcodes = shortcode_cache_get_cached_shortcodes();
-$shortcodes_text = implode( "\n", $shortcodes );
+$config = get_option( 'shortcode_cache_config', array() );
 $monitored_url = shortcode_cache_get_monitored_url();
 $show_success = isset( $_GET['settings-updated'] ) && $_GET['settings-updated'];
 $cached_items = shortcode_cache_get_all_cached_items();
@@ -46,31 +45,83 @@ $detected_shortcodes = shortcode_cache_get_detected_shortcodes();
                         </p>
                     </td>
                 </tr>
-                <tr>
-                    <th scope="row">
-                        <label for="shortcode_cache_list">
-                            <?php esc_html_e( 'Shortcodes to Cache', 'shortcode-cache' ); ?>
-                        </label>
-                    </th>
-                    <td>
-                        <textarea
-                            id="shortcode_cache_list"
-                            name="shortcode_cache_list"
-                            rows="10"
-                            cols="50"
-                            class="large-text"
-                            placeholder="<?php esc_attr_e( 'Enter one shortcode per line', 'shortcode-cache' ); ?>"
-                        ><?php echo esc_textarea( $shortcodes_text ); ?></textarea>
-                        <p class="description">
-                            <?php esc_html_e( 'Enter the shortcode names you want to cache, one per line. Example: products-ordered-by-discount', 'shortcode-cache' ); ?>
-                        </p>
-                    </td>
-                </tr>
             </tbody>
         </table>
 
         <?php submit_button(); ?>
     </form>
+
+    <hr />
+
+    <h2><?php esc_html_e( 'Shortcodes to Cache', 'shortcode-cache' ); ?></h2>
+
+    <div class="shortcode-cache-add-form" style="background: #f9f9f9; padding: 15px; border: 1px solid #ddd; border-radius: 4px; margin-bottom: 20px;">
+        <div style="display: flex; gap: 10px; align-items: flex-end;">
+            <div style="flex: 1;">
+                <label for="shortcode_cache_new_name" style="display: block; margin-bottom: 5px; font-weight: bold;">
+                    <?php esc_html_e( 'Shortcode Name', 'shortcode-cache' ); ?>
+                </label>
+                <input
+                    type="text"
+                    id="shortcode_cache_new_name"
+                    class="regular-text shortcode-cache-new-name"
+                    placeholder="<?php esc_attr_e( 'e.g., products-list', 'shortcode-cache' ); ?>"
+                />
+            </div>
+            <button
+                type="button"
+                class="button button-primary shortcode-cache-add-btn"
+            >
+                <?php esc_html_e( 'Add Shortcode', 'shortcode-cache' ); ?>
+            </button>
+        </div>
+    </div>
+
+    <?php if ( empty( $config ) ) : ?>
+        <p><?php esc_html_e( 'No shortcodes configured yet. Add your first shortcode to cache above.', 'shortcode-cache' ); ?></p>
+    <?php else : ?>
+        <table class="wp-list-table widefat striped">
+            <thead>
+                <tr>
+                    <th scope="col"><?php esc_html_e( 'Shortcode Name', 'shortcode-cache' ); ?></th>
+                    <th scope="col"><?php esc_html_e( 'Cache by User Role', 'shortcode-cache' ); ?></th>
+                    <th scope="col"><?php esc_html_e( 'Action', 'shortcode-cache' ); ?></th>
+                </tr>
+            </thead>
+            <tbody>
+                <?php foreach ( $config as $index => $item ) : ?>
+                    <tr class="shortcode-cache-item-row">
+                        <td>
+                            <span class="shortcode-cache-item-name">
+                                <?php echo esc_html( $item['name'] ); ?>
+                            </span>
+                            <input type="hidden" class="shortcode-cache-item-index" value="<?php echo esc_attr( $index ); ?>" />
+                        </td>
+                        <td>
+                            <label style="display: flex; align-items: center; gap: 5px;">
+                                <input
+                                    type="checkbox"
+                                    class="shortcode-cache-role-toggle"
+                                    <?php checked( isset( $item['role_based'] ) ? $item['role_based'] : false ); ?>
+                                    data-index="<?php echo esc_attr( $index ); ?>"
+                                />
+                                <?php esc_html_e( 'Include User Role in Cache Key', 'shortcode-cache' ); ?>
+                            </label>
+                        </td>
+                        <td>
+                            <button
+                                type="button"
+                                class="button button-small button-danger shortcode-cache-delete-btn"
+                                data-index="<?php echo esc_attr( $index ); ?>"
+                            >
+                                <?php esc_html_e( 'Delete', 'shortcode-cache' ); ?>
+                            </button>
+                        </td>
+                    </tr>
+                <?php endforeach; ?>
+            </tbody>
+        </table>
+    <?php endif; ?>
 
     <hr />
 

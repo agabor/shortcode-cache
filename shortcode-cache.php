@@ -2,7 +2,7 @@
 /**
  * Plugin Name: Shortcode Cache
  * Description: Cache rendered HTML for specific shortcodes
- * Version: 1.0.2
+ * Version: 1.1.1
  * Author: Gabor Angyal
  * Author URI: https://webshop.tech
  * License: GPL v2 or later
@@ -30,6 +30,9 @@ add_action( 'admin_init', 'shortcode_cache_register_settings' );
 add_action( 'init', 'shortcode_cache_initialize_shortcode_caching', 20 );
 add_action( 'wp_ajax_shortcode_cache_clear', 'shortcode_cache_handle_clear_cache' );
 add_action( 'wp_ajax_shortcode_cache_clear_detected', 'shortcode_cache_handle_clear_detected_shortcodes' );
+add_action( 'wp_ajax_shortcode_cache_add', 'shortcode_cache_handle_add_shortcode' );
+add_action( 'wp_ajax_shortcode_cache_delete', 'shortcode_cache_handle_delete_shortcode' );
+add_action( 'wp_ajax_shortcode_cache_toggle_role', 'shortcode_cache_handle_toggle_role_based_caching' );
 add_action( 'wp', 'shortcode_cache_detect_current_page_shortcodes', 999 );
 
 function shortcode_cache_register_admin_menu() {
@@ -49,7 +52,15 @@ function shortcode_cache_enqueue_admin_scripts() {
         'shortcode-cache-manager',
         SHORTCODE_CACHE_URL . 'admin/js/cache-manager.js',
         array( 'jquery' ),
-        '1.0.2',
+        '1.1.1',
+        true
+    );
+
+    wp_enqueue_script(
+        'shortcode-cache-settings-manager',
+        SHORTCODE_CACHE_URL . 'admin/js/settings-list-manager.js',
+        array( 'jquery' ),
+        '1.1.1',
         true
     );
 
@@ -65,7 +76,7 @@ function shortcode_cache_enqueue_admin_scripts() {
 function shortcode_cache_register_settings() {
     register_setting(
         'shortcode_cache_group',
-        'shortcode_cache_list'
+        'shortcode_cache_config'
     );
 
     register_setting(
@@ -83,17 +94,21 @@ function shortcode_cache_render_settings_page() {
 }
 
 function shortcode_cache_get_cached_shortcodes() {
-    $shortcodes = get_option( 'shortcode_cache_list', '' );
-    $shortcodes = trim( $shortcodes );
+    $config = get_option( 'shortcode_cache_config', array() );
 
-    if ( empty( $shortcodes ) ) {
+    if ( ! is_array( $config ) ) {
         return array();
     }
 
-    $shortcode_list = array_map( 'trim', explode( "\n", $shortcodes ) );
-    $shortcode_list = array_filter( $shortcode_list );
+    $shortcodes = array();
 
-    return array_values( $shortcode_list );
+    foreach ( $config as $shortcode_item ) {
+        if ( isset( $shortcode_item['name'] ) && ! empty( $shortcode_item['name'] ) ) {
+            $shortcodes[] = $shortcode_item['name'];
+        }
+    }
+
+    return $shortcodes;
 }
 
 function shortcode_cache_initialize_shortcode_caching() {

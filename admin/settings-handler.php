@@ -4,22 +4,43 @@ if ( ! defined( 'ABSPATH' ) ) {
     exit;
 }
 
-add_filter( 'sanitize_option_shortcode_cache_list', 'shortcode_cache_sanitize_shortcode_names' );
+add_filter( 'sanitize_option_shortcode_cache_config', 'shortcode_cache_sanitize_shortcode_config' );
 add_filter( 'sanitize_option_shortcode_cache_monitored_url', 'shortcode_cache_sanitize_monitored_url' );
 
-function shortcode_cache_sanitize_shortcode_names( $value ) {
+function shortcode_cache_sanitize_shortcode_config( $value ) {
     if ( empty( $value ) ) {
-        return '';
+        return array();
     }
 
-    $shortcode_list = array_map( 'trim', explode( "\n", $value ) );
-    $shortcode_list = array_filter( $shortcode_list );
+    if ( ! is_array( $value ) ) {
+        return array();
+    }
 
-    $sanitized_list = array_map( function( $shortcode ) {
-        return sanitize_text_field( $shortcode );
-    }, $shortcode_list );
+    $sanitized_config = array();
 
-    return implode( "\n", $sanitized_list );
+    foreach ( $value as $item ) {
+        if ( ! is_array( $item ) ) {
+            continue;
+        }
+
+        $sanitized_item = array();
+
+        if ( isset( $item['name'] ) ) {
+            $sanitized_item['name'] = sanitize_text_field( $item['name'] );
+        }
+
+        if ( isset( $item['role_based'] ) ) {
+            $sanitized_item['role_based'] = (bool) $item['role_based'];
+        } else {
+            $sanitized_item['role_based'] = false;
+        }
+
+        if ( ! empty( $sanitized_item['name'] ) ) {
+            $sanitized_config[] = $sanitized_item;
+        }
+    }
+
+    return $sanitized_config;
 }
 
 function shortcode_cache_sanitize_monitored_url( $value ) {

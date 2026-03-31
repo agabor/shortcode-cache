@@ -37,22 +37,6 @@ function shortcode_cache_wrap_shortcode_with_cache( $shortcode_name, $shortcode_
     };
 }
 
-function shortcode_cache_wrap_shortcode_for_detection( $shortcode_name ) {
-    global $shortcode_tags;
-
-    if ( ! isset( $shortcode_tags[ $shortcode_name ] ) ) {
-        return;
-    }
-
-    $original_callback = $shortcode_tags[ $shortcode_name ];
-
-    $shortcode_tags[ $shortcode_name ] = function( $atts = array(), $content = '', $tag = '' ) use ( $original_callback, $shortcode_name ) {
-        $instance_id = isset( $atts['id'] ) ? $atts['id'] : null;
-        shortcode_cache_track_shortcode_execution( $shortcode_name, $instance_id );
-        return call_user_func( $original_callback, $atts, $content, $tag );
-    };
-}
-
 function shortcode_cache_should_use_cache($atts, $configured_id) {
 
     if ($configured_id) {
@@ -131,29 +115,4 @@ function shortcode_cache_track_cached_item( $cache_key, $shortcode_name, $atts, 
     $cached_items[ $cache_key ] = $item_data;
 
     shortcode_cache_set_items( $cached_items );
-}
-
-function shortcode_cache_track_shortcode_execution( $shortcode_name, $instance_id = null ) {
-    $detected_shortcodes = get_transient( 'shortcode_cache_detected_shortcodes' );
-
-    if ( false === $detected_shortcodes ) {
-        $detected_shortcodes = array();
-    }
-
-    if ( ! is_array( $detected_shortcodes ) ) {
-        $detected_shortcodes = array();
-    }
-
-    $key = $shortcode_name;
-    if ( null !== $instance_id && ! empty( $instance_id ) ) {
-        $key = $shortcode_name . '::' . $instance_id;
-    }
-
-    if ( ! isset( $detected_shortcodes[ $key ] ) ) {
-        $detected_shortcodes[ $key ] = 0;
-    }
-
-    $detected_shortcodes[ $key ]++;
-
-    set_transient( 'shortcode_cache_detected_shortcodes', $detected_shortcodes, WEEK_IN_SECONDS );
 }

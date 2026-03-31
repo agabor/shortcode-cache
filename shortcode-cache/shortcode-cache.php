@@ -22,7 +22,6 @@ require_once SHORTCODE_CACHE_DIR . 'includes/cache-operations.php';
 require_once SHORTCODE_CACHE_DIR . 'includes/role-utils.php';
 require_once SHORTCODE_CACHE_DIR . 'includes/shortcode-caching.php';
 require_once SHORTCODE_CACHE_DIR . 'includes/cache-inspector.php';
-require_once SHORTCODE_CACHE_DIR . 'includes/url-detection.php';
 require_once SHORTCODE_CACHE_DIR . 'admin/settings-handler.php';
 require_once SHORTCODE_CACHE_DIR . 'admin/ajax-handler.php';
 
@@ -31,14 +30,12 @@ add_action( 'admin_init', 'shortcode_cache_register_settings' );
 add_action( 'init', 'shortcode_cache_initialize_shortcode_caching', 20 );
 add_action( 'wp_ajax_shortcode_cache_clear', 'shortcode_cache_handle_clear_cache' );
 add_action( 'wp_ajax_shortcode_cache_clear_all', 'shortcode_cache_handle_clear_all_cache' );
-add_action( 'wp_ajax_shortcode_cache_clear_detected', 'shortcode_cache_handle_clear_detected_shortcodes' );
 add_action( 'wp_ajax_shortcode_cache_add', 'shortcode_cache_handle_add_shortcode' );
 add_action( 'wp_ajax_shortcode_cache_delete', 'shortcode_cache_handle_delete_shortcode' );
 add_action( 'wp_ajax_shortcode_cache_update_role_caching', 'shortcode_cache_handle_update_shortcode_role_caching' );
 add_action( 'wp_ajax_shortcode_cache_update_global_roles', 'shortcode_cache_handle_update_global_roles' );
 add_action( 'wp_ajax_shortcode_cache_get_roles', 'shortcode_cache_handle_get_available_roles' );
 add_action( 'wp_ajax_shortcode_cache_get_content', 'shortcode_cache_handle_get_cached_content' );
-add_action( 'wp', 'shortcode_cache_setup_detection', 999 );
 
 function shortcode_cache_register_admin_menu() {
     $hook_suffix = add_options_page(
@@ -93,11 +90,6 @@ function shortcode_cache_register_settings() {
 
     register_setting(
         'shortcode_cache_group',
-        'shortcode_cache_monitored_url'
-    );
-
-    register_setting(
-        'shortcode_cache_group',
         'shortcode_cache_global_roles'
     );
 }
@@ -139,17 +131,5 @@ function shortcode_cache_initialize_shortcode_caching() {
         if ( isset( $shortcode_tags[ $shortcode_name ] ) ) {
             shortcode_cache_wrap_shortcode_with_cache( $shortcode_name, $shortcode_config );
         }
-    }
-}
-
-function shortcode_cache_setup_detection() {
-    if ( ! shortcode_cache_is_monitored_page() ) {
-        return;
-    }
-
-    global $shortcode_tags;
-
-    foreach ( $shortcode_tags as $shortcode_name => $callback ) {
-        shortcode_cache_wrap_shortcode_for_detection( $shortcode_name );
     }
 }

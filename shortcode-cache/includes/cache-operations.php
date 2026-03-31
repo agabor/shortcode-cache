@@ -53,7 +53,7 @@ function shortcode_cache_format_bytes( $bytes, $precision = 2 ) {
     $pow = min( $pow, count( $units ) - 1 );
     $bytes /= ( 1 << ( 10 * $pow ) );
 
-    return round($bytes, $precision) . ' cache-operations.php' . $units[ $pow ];
+    return round($bytes, $precision) . ' ' . $units[ $pow ];
 }
 
 function shortcode_cache_get_items() {

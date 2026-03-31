@@ -18,26 +18,14 @@ if ( ! defined( 'ABSPATH' ) ) {
 define( 'SHORTCODE_CACHE_DIR', plugin_dir_path( __FILE__ ) );
 define( 'SHORTCODE_CACHE_URL', plugin_dir_url( __FILE__ ) );
 
-require_once SHORTCODE_CACHE_DIR . 'includes/cache-operations.php';
 require_once SHORTCODE_CACHE_DIR . 'includes/role-utils.php';
-require_once SHORTCODE_CACHE_DIR . 'includes/shortcode-caching.php';
-require_once SHORTCODE_CACHE_DIR . 'includes/cache-inspector.php';
 require_once SHORTCODE_CACHE_DIR . 'includes/url-detection.php';
 require_once SHORTCODE_CACHE_DIR . 'admin/settings-handler.php';
 require_once SHORTCODE_CACHE_DIR . 'admin/ajax-handler.php';
 
 add_action( 'admin_menu', 'shortcode_cache_register_admin_menu' );
 add_action( 'admin_init', 'shortcode_cache_register_settings' );
-add_action( 'init', 'shortcode_cache_initialize_shortcode_caching', 20 );
-add_action( 'wp_ajax_shortcode_cache_clear', 'shortcode_cache_handle_clear_cache' );
-add_action( 'wp_ajax_shortcode_cache_clear_all', 'shortcode_cache_handle_clear_all_cache' );
 add_action( 'wp_ajax_shortcode_cache_clear_detected', 'shortcode_cache_handle_clear_detected_shortcodes' );
-add_action( 'wp_ajax_shortcode_cache_add', 'shortcode_cache_handle_add_shortcode' );
-add_action( 'wp_ajax_shortcode_cache_delete', 'shortcode_cache_handle_delete_shortcode' );
-add_action( 'wp_ajax_shortcode_cache_update_role_caching', 'shortcode_cache_handle_update_shortcode_role_caching' );
-add_action( 'wp_ajax_shortcode_cache_update_global_roles', 'shortcode_cache_handle_update_global_roles' );
-add_action( 'wp_ajax_shortcode_cache_get_roles', 'shortcode_cache_handle_get_available_roles' );
-add_action( 'wp_ajax_shortcode_cache_get_content', 'shortcode_cache_handle_get_cached_content' );
 add_action( 'wp', 'shortcode_cache_setup_detection', 999 );
 
 function shortcode_cache_register_admin_menu() {
@@ -56,14 +44,6 @@ function shortcode_cache_enqueue_admin_scripts() {
     wp_enqueue_script(
         'shortcode-cache-manager',
         SHORTCODE_CACHE_URL . 'admin/js/cache-manager.js',
-        array( 'jquery' ),
-        '1.1.13',
-        true
-    );
-
-    wp_enqueue_script(
-        'shortcode-cache-settings-manager',
-        SHORTCODE_CACHE_URL . 'admin/js/settings-list-manager.js',
         array( 'jquery' ),
         '1.1.13',
         true
@@ -88,17 +68,7 @@ function shortcode_cache_enqueue_admin_scripts() {
 function shortcode_cache_register_settings() {
     register_setting(
         'shortcode_cache_group',
-        'shortcode_cache_config'
-    );
-
-    register_setting(
-        'shortcode_cache_group',
         'shortcode_cache_monitored_url'
-    );
-
-    register_setting(
-        'shortcode_cache_group',
-        'shortcode_cache_global_roles'
     );
 }
 
@@ -108,38 +78,6 @@ function shortcode_cache_render_settings_page() {
     }
 
     include SHORTCODE_CACHE_DIR . 'admin/settings-page.php';
-}
-
-function shortcode_cache_get_cached_shortcodes() {
-    $config = get_option( 'shortcode_cache_config', array() );
-
-    if ( ! is_array( $config ) ) {
-        return array();
-    }
-
-    $shortcodes = array();
-
-    foreach ( $config as $shortcode_item ) {
-        if ( isset( $shortcode_item['name'] ) && ! empty( $shortcode_item['name'] ) ) {
-            $shortcodes[] = $shortcode_item;
-        }
-    }
-
-    return $shortcodes;
-}
-
-function shortcode_cache_initialize_shortcode_caching() {
-    global $shortcode_tags;
-
-    $shortcodes_to_cache = shortcode_cache_get_cached_shortcodes();
-
-    foreach ( $shortcodes_to_cache as $shortcode_config ) {
-        $shortcode_name = $shortcode_config['name'];
-        
-        if ( isset( $shortcode_tags[ $shortcode_name ] ) ) {
-            shortcode_cache_wrap_shortcode_with_cache( $shortcode_name, $shortcode_config );
-        }
-    }
 }
 
 function shortcode_cache_setup_detection() {
@@ -152,4 +90,45 @@ function shortcode_cache_setup_detection() {
     foreach ( $shortcode_tags as $shortcode_name => $callback ) {
         shortcode_cache_wrap_shortcode_for_detection( $shortcode_name );
     }
+}
+
+function shortcode_cache_wrap_shortcode_for_detection( $shortcode_name ) {
+    global $shortcode_tags;
+
+    if ( ! isset( $shortcode_tags[ $shortcode_name ] ) ) {
+        return;
+    }
+
+    $original_callback = $shortcode_tags[ $shortcode_name ];
+
+    $shortcode_tags[ $shortcode_name ] = function( $atts = array(), $content = '', $tag = '' ) use ( $original_callback, $shortcode_name ) {
+        $instance_id = isset( $atts['id'] ) ? $atts['id'] : null;
+        shortcode_cache_track_shortcode_execution( $shortcode_name, $instance_id );
+        return call_user_func( $original_callback, $atts, $content, $tag );
+    };
+}
+
+function shortcode_cache_track_shortcode_execution( $shortcode_name, $instance_id = null ) {
+    $detected_shortcodes = get_transient( 'shortcode_cache_detected_shortcodes' );
+
+    if ( false === $detected_shortcodes ) {
+        $detected_shortcodes = array();
+    }
+
+    if ( ! is_array( $detected_shortcodes ) ) {
+        $detected_shortcodes = array();
+    }
+
+    $key = $shortcode_name;
+    if ( null !== $instance_id && ! empty( $instance_id ) ) {
+        $key = $shortcode_name . '::' . $instance_id;
+    }
+
+    if ( ! isset( $detected_shortcodes[ $key ] ) ) {
+        $detected_shortcodes[ $key ] = 0;
+    }
+
+    $detected_shortcodes[ $key ]++;
+
+    set_transient( 'shortcode_cache_detected_shortcodes', $detected_shortcodes, WEEK_IN_SECONDS );
 }

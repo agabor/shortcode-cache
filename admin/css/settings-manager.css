@@ -142,6 +142,22 @@
     text-align: center;
 }
 
+.shortcode-cache-key-column {
+    width: 250px;
+    text-align: left;
+}
+
+.shortcode-cache-key-display {
+    display: block;
+    word-break: break-all;
+    font-size: 12px;
+    line-height: 1.4;
+    background-color: #f5f5f5;
+    padding: 4px 6px;
+    border-radius: 3px;
+    border: 1px solid #e0e0e0;
+}
+
 .shortcode-cache-role-toggle {
     display: inline-flex;
     align-items: center;

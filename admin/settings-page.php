@@ -231,6 +231,7 @@ usort( $parsed_detected, function( $a, $b ) {
                     <th scope="col"><?php esc_html_e( 'Shortcode', 'shortcode-cache' ); ?></th>
                     <th scope="col"><?php esc_html_e( 'ID', 'shortcode-cache' ); ?></th>
                     <th scope="col"><?php esc_html_e( 'Parameters', 'shortcode-cache' ); ?></th>
+                    <th scope="col" class="shortcode-cache-key-column"><?php esc_html_e( 'Cache Key', 'shortcode-cache' ); ?></th>
                     <th scope="col"><?php esc_html_e( 'Size', 'shortcode-cache' ); ?></th>
                     <th scope="col"><?php esc_html_e( 'Content', 'shortcode-cache' ); ?></th>
                     <th scope="col"><?php esc_html_e( 'Action', 'shortcode-cache' ); ?></th>
@@ -242,6 +243,9 @@ usort( $parsed_detected, function( $a, $b ) {
                         <td><?php echo esc_html( $item_data['shortcode'] ); ?></td>
                         <td><?php echo isset( $item_data['id'] ) && ! empty( $item_data['id'] ) ? esc_html( $item_data['id'] ) : '—'; ?></td>
                         <td><?php echo shortcode_cache_extract_parameters_from_item( $item_data ); ?></td>
+                        <td class="shortcode-cache-key-column">
+                            <code class="shortcode-cache-key-display"><?php echo esc_html( $cache_key ); ?></code>
+                        </td>
                         <td><?php echo esc_html( shortcode_cache_format_bytes( shortcode_cache_get_size( $cache_key, 'shortcode_cache' ) ) ); ?></td>
                         <td>
                             <button

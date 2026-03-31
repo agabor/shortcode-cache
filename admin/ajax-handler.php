@@ -171,3 +171,25 @@ function shortcode_cache_handle_get_available_roles() {
 
     wp_send_json_success( array( 'roles' => $all_roles ) );
 }
+
+function shortcode_cache_handle_get_cached_content() {
+    if ( ! current_user_can( 'manage_options' ) ) {
+        wp_send_json_error( array( 'message' => __( 'Insufficient permissions', 'shortcode-cache' ) ) );
+    }
+
+    $cache_key = isset( $_POST['cache_key'] ) ? sanitize_text_field( $_POST['cache_key'] ) : '';
+
+    if ( empty( $cache_key ) ) {
+        wp_send_json_error( array( 'message' => __( 'Invalid cache key', 'shortcode-cache' ) ) );
+    }
+
+    $content = shortcode_cache_get_cached_item_content( $cache_key );
+
+    if ( null === $content ) {
+        wp_send_json_error( array( 'message' => __( 'Cache content not found', 'shortcode-cache' ) ) );
+    }
+
+    wp_send_json_success( array(
+        'content' => $content,
+    ) );
+}

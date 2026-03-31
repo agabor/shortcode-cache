@@ -231,6 +231,8 @@ usort( $parsed_detected, function( $a, $b ) {
                     <th scope="col"><?php esc_html_e( 'Shortcode', 'shortcode-cache' ); ?></th>
                     <th scope="col"><?php esc_html_e( 'ID', 'shortcode-cache' ); ?></th>
                     <th scope="col"><?php esc_html_e( 'Parameters', 'shortcode-cache' ); ?></th>
+                    <th scope="col"><?php esc_html_e( 'Size', 'shortcode-cache' ); ?></th>
+                    <th scope="col"><?php esc_html_e( 'Content', 'shortcode-cache' ); ?></th>
                     <th scope="col"><?php esc_html_e( 'Action', 'shortcode-cache' ); ?></th>
                 </tr>
             </thead>
@@ -240,6 +242,16 @@ usort( $parsed_detected, function( $a, $b ) {
                         <td><?php echo esc_html( $item_data['shortcode'] ); ?></td>
                         <td><?php echo isset( $item_data['id'] ) && ! empty( $item_data['id'] ) ? esc_html( $item_data['id'] ) : '—'; ?></td>
                         <td><?php echo shortcode_cache_extract_parameters_from_item( $item_data ); ?></td>
+                        <td><?php echo esc_html( shortcode_cache_format_bytes( shortcode_cache_get_size( $cache_key, 'shortcode_cache' ) ) ); ?></td>
+                        <td>
+                            <button
+                                type="button"
+                                class="button button-small shortcode-cache-view-content-btn"
+                                data-cache-key="<?php echo esc_attr( $cache_key ); ?>"
+                            >
+                                <?php esc_html_e( 'View Content', 'shortcode-cache' ); ?>
+                            </button>
+                        </td>
                         <td>
                             <button
                                 type="button"
@@ -285,6 +297,23 @@ usort( $parsed_detected, function( $a, $b ) {
             </button>
             <button type="button" class="button button-primary shortcode-cache-modal-save">
                 <?php esc_html_e( 'Save Roles', 'shortcode-cache' ); ?>
+            </button>
+        </div>
+    </div>
+</div>
+
+<div id="shortcode-cache-content-modal" class="shortcode-cache-content-modal" style="display: none;">
+    <div class="shortcode-cache-content-modal-content">
+        <div class="shortcode-cache-content-modal-header">
+            <h2><?php esc_html_e( 'Cached Content', 'shortcode-cache' ); ?></h2>
+            <button type="button" class="shortcode-cache-content-modal-close">&times;</button>
+        </div>
+        <div class="shortcode-cache-content-modal-body">
+            <pre class="shortcode-cache-content-display"></pre>
+        </div>
+        <div class="shortcode-cache-content-modal-footer">
+            <button type="button" class="button shortcode-cache-content-modal-cancel">
+                <?php esc_html_e( 'Close', 'shortcode-cache' ); ?>
             </button>
         </div>
     </div>

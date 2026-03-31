@@ -36,6 +36,7 @@ add_action( 'wp_ajax_shortcode_cache_delete', 'shortcode_cache_handle_delete_sho
 add_action( 'wp_ajax_shortcode_cache_update_role_caching', 'shortcode_cache_handle_update_shortcode_role_caching' );
 add_action( 'wp_ajax_shortcode_cache_update_global_roles', 'shortcode_cache_handle_update_global_roles' );
 add_action( 'wp_ajax_shortcode_cache_get_roles', 'shortcode_cache_handle_get_available_roles' );
+add_action( 'wp_ajax_shortcode_cache_get_content', 'shortcode_cache_handle_get_cached_content' );
 add_action( 'wp', 'shortcode_cache_setup_detection', 999 );
 
 function shortcode_cache_register_admin_menu() {

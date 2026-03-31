@@ -109,5 +109,72 @@
                 },
             });
         });
+
+        $(document).on('click', '.shortcode-cache-view-content-btn', function (e) {
+            e.preventDefault();
+
+            const button = $(this);
+            const cacheKey = button.data('cache-key');
+
+            openContentModal(cacheKey);
+        });
+
+        $(document).on('click', '.shortcode-cache-content-modal-close', function () {
+            closeContentModal();
+        });
+
+        $(document).on('click', '.shortcode-cache-content-modal-cancel', function () {
+            closeContentModal();
+        });
+
+        $(document).on('click', '#shortcode-cache-content-modal', function (e) {
+            if ($(e.target).is('#shortcode-cache-content-modal')) {
+                closeContentModal();
+            }
+        });
     });
+
+    function openContentModal(cacheKey) {
+        const modal = $('#shortcode-cache-content-modal');
+        const contentDisplay = modal.find('.shortcode-cache-content-display');
+
+        contentDisplay.html('<span class="shortcode-cache-content-loading">Loading...</span>');
+        modal.show();
+
+        $.ajax({
+            url: shortcodeCacheData.ajaxUrl,
+            type: 'POST',
+            data: {
+                action: 'shortcode_cache_get_content',
+                cache_key: cacheKey,
+            },
+            success: function (response) {
+                if (response.success) {
+                    contentDisplay.text(response.data.content);
+                } else {
+                    contentDisplay.html('<span class="shortcode-cache-content-error">Error: ' + escapeHtml(response.data.message) + '</span>');
+                }
+            },
+            error: function () {
+                contentDisplay.html('<span class="shortcode-cache-content-error">An error occurred while retrieving the content.</span>');
+            },
+        });
+    }
+
+    function closeContentModal() {
+        $('#shortcode-cache-content-modal').hide();
+    }
+
+    function escapeHtml(text) {
+        const map = {
+            '&': '&amp;',
+            '<': '&lt;',
+            '>': '&gt;',
+            '"': '&quot;',
+            "'": '&#039;',
+        };
+        return text.replace(/[&<>"']/g, function (m) {
+            return map[m];
+        });
+    }
 })(jQuery);

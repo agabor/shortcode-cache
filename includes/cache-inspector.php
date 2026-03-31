@@ -84,5 +84,16 @@ function shortcode_cache_clear_all_cache() {
     delete_transient( 'shortcode_cache_items' );
 }
 
+function shortcode_cache_get_cached_item_content( $cache_key ) {
+    $group = 'shortcode_cache';
+    $content = shortcode_cache_get( $cache_key, $group );
+
+    if ( false === $content ) {
+        return null;
+    }
+
+    return $content;
+}
+
 add_action( 'wp_ajax_shortcode_cache_clear', 'shortcode_cache_handle_clear_cache' );
 add_action( 'wp_ajax_shortcode_cache_clear_all', 'shortcode_cache_handle_clear_all_cache' );

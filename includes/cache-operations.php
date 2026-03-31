@@ -33,3 +33,25 @@ function shortcode_cache_flush() {
         wp_cache_flush();
     }
 }
+
+function shortcode_cache_get_size( $cache_key, $group ) {
+    $content = shortcode_cache_get( $cache_key, $group );
+
+    if ( false === $content ) {
+        return 0;
+    }
+
+    return strlen( $content );
+}
+
+function shortcode_cache_format_bytes( $bytes, $precision = 2 ) {
+    $bytes = (int) $bytes;
+    $units = array( 'B', 'KB', 'MB', 'GB' );
+
+    $bytes = max( $bytes, 0 );
+    $pow = floor( ( $bytes ? log( $bytes ) : 0 ) / log( 1024 ) );
+    $pow = min( $pow, count( $units ) - 1 );
+    $bytes /= ( 1 << ( 10 * $pow ) );
+
+    return round( $bytes, $precision ) . ' ' . $units[ $pow ];
+}

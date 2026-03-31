@@ -94,6 +94,3 @@ function shortcode_cache_get_cached_item_content( $cache_key ) {
 
     return $content;
 }
-
-add_action( 'wp_ajax_shortcode_cache_clear', 'shortcode_cache_handle_clear_cache' );
-add_action( 'wp_ajax_shortcode_cache_clear_all', 'shortcode_cache_handle_clear_all_cache' );

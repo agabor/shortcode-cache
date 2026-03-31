@@ -2,7 +2,7 @@
 /**
  * Plugin Name: Shortcode Cache
  * Description: Cache rendered HTML for specific shortcodes
- * Version: 1.1.8
+ * Version: 1.1.9
  * Author: Gabor Angyal
  * Author URI: https://webshop.tech
  * License: GPL v2 or later
@@ -30,6 +30,7 @@ add_action( 'admin_menu', 'shortcode_cache_register_admin_menu' );
 add_action( 'admin_init', 'shortcode_cache_register_settings' );
 add_action( 'init', 'shortcode_cache_initialize_shortcode_caching', 20 );
 add_action( 'wp_ajax_shortcode_cache_clear', 'shortcode_cache_handle_clear_cache' );
+add_action( 'wp_ajax_shortcode_cache_clear_all', 'shortcode_cache_handle_clear_all_cache' );
 add_action( 'wp_ajax_shortcode_cache_clear_detected', 'shortcode_cache_handle_clear_detected_shortcodes' );
 add_action( 'wp_ajax_shortcode_cache_add', 'shortcode_cache_handle_add_shortcode' );
 add_action( 'wp_ajax_shortcode_cache_delete', 'shortcode_cache_handle_delete_shortcode' );
@@ -56,7 +57,7 @@ function shortcode_cache_enqueue_admin_scripts() {
         'shortcode-cache-manager',
         SHORTCODE_CACHE_URL . 'admin/js/cache-manager.js',
         array( 'jquery' ),
-        '1.1.8',
+        '1.1.9',
         true
     );
 
@@ -64,7 +65,7 @@ function shortcode_cache_enqueue_admin_scripts() {
         'shortcode-cache-settings-manager',
         SHORTCODE_CACHE_URL . 'admin/js/settings-list-manager.js',
         array( 'jquery' ),
-        '1.1.8',
+        '1.1.9',
         true
     );
 
@@ -72,7 +73,7 @@ function shortcode_cache_enqueue_admin_scripts() {
         'shortcode-cache-settings-manager',
         SHORTCODE_CACHE_URL . 'admin/css/settings-manager.css',
         array(),
-        '1.1.8'
+        '1.1.9'
     );
 
     wp_localize_script(

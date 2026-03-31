@@ -103,15 +103,7 @@ function shortcode_cache_generate_cache_key($shortcode_name, $atts, $role_cachin
 }
 
 function shortcode_cache_track_cached_item( $cache_key, $shortcode_name, $atts, $role_caching_enabled, $configured_id ) {
-    $cached_items = get_transient( 'shortcode_cache_items' );
-
-    if ( false === $cached_items ) {
-        $cached_items = array();
-    }
-
-    if ( ! is_array( $cached_items ) ) {
-        $cached_items = array();
-    }
+    $cached_items = shortcode_cache_get_items();
 
     $instance_id = null;
     if ( null !== $configured_id ) {
@@ -138,7 +130,7 @@ function shortcode_cache_track_cached_item( $cache_key, $shortcode_name, $atts, 
 
     $cached_items[ $cache_key ] = $item_data;
 
-    set_transient( 'shortcode_cache_items', $cached_items, DAY_IN_SECONDS );
+    shortcode_cache_set_items( $cached_items );
 }
 
 function shortcode_cache_track_shortcode_execution( $shortcode_name, $instance_id = null ) {

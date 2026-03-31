@@ -5,11 +5,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 }
 
 function shortcode_cache_get_all_cached_items() {
-    $cached_items = get_transient( 'shortcode_cache_items' );
-
-    if ( false === $cached_items || ! is_array( $cached_items ) ) {
-        return array();
-    }
+    $cached_items = shortcode_cache_get_items();
 
     $items_with_status = array();
 
@@ -56,11 +52,11 @@ function shortcode_cache_clear_specific_cache( $cache_key ) {
     $success = shortcode_cache_delete( $cache_key, $group );
 
     if ( $success ) {
-        $cached_items = get_transient( 'shortcode_cache_items' );
+        $cached_items = shortcode_cache_get_items();
 
-        if ( is_array( $cached_items ) && isset( $cached_items[ $cache_key ] ) ) {
+        if ( isset( $cached_items[ $cache_key ] ) ) {
             unset( $cached_items[ $cache_key ] );
-            set_transient( 'shortcode_cache_items', $cached_items, DAY_IN_SECONDS );
+            shortcode_cache_set_items( $cached_items );
         }
     }
 
@@ -68,16 +64,14 @@ function shortcode_cache_clear_specific_cache( $cache_key ) {
 }
 
 function shortcode_cache_clear_all_cache() {
-    $cached_items = get_transient( 'shortcode_cache_items' );
+    $cached_items = shortcode_cache_get_items();
     
-    if ( is_array( $cached_items ) ) {
-        foreach ( $cached_items as $cache_key => $item_data ) {
-            shortcode_cache_delete( $cache_key, 'shortcode_cache' );
-        }
+    foreach ( $cached_items as $cache_key => $item_data ) {
+        shortcode_cache_delete( $cache_key, 'shortcode_cache' );
     }
     
     shortcode_cache_flush();
-    delete_transient( 'shortcode_cache_items' );
+    shortcode_cache_delete_items();
 }
 
 function shortcode_cache_get_cached_item_content( $cache_key ) {

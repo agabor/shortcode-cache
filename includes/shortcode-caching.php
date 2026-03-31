@@ -13,11 +13,11 @@ function shortcode_cache_wrap_shortcode_with_cache( $shortcode_name ) {
 
     $original_callback = $shortcode_tags[ $shortcode_name ];
 
-    $shortcode_tags[ $shortcode_name ] = function( $atts ) use ( $original_callback, $shortcode_name ) {
+    $shortcode_tags[ $shortcode_name ] = function( $atts = array(), $content = '', $tag = '' ) use ( $original_callback, $shortcode_name ) {
         $should_use_cache = shortcode_cache_should_use_cache( $shortcode_name );
 
         if ( ! $should_use_cache ) {
-            return call_user_func( $original_callback, $atts );
+            return call_user_func( $original_callback, $atts, $content, $tag );
         }
 
         $cache_key = shortcode_cache_generate_cache_key( $shortcode_name, $atts );
@@ -26,7 +26,7 @@ function shortcode_cache_wrap_shortcode_with_cache( $shortcode_name ) {
         $output = shortcode_cache_get( $cache_key, $group );
 
         if ( false === $output ) {
-            $output = call_user_func( $original_callback, $atts );
+            $output = call_user_func( $original_callback, $atts, $content, $tag );
             shortcode_cache_set( $cache_key, $output, $group, HOUR_IN_SECONDS );
             shortcode_cache_track_cached_item( $cache_key, $shortcode_name, $atts );
         }
@@ -44,9 +44,9 @@ function shortcode_cache_wrap_shortcode_for_detection( $shortcode_name ) {
 
     $original_callback = $shortcode_tags[ $shortcode_name ];
 
-    $shortcode_tags[ $shortcode_name ] = function( $atts ) use ( $original_callback, $shortcode_name ) {
+    $shortcode_tags[ $shortcode_name ] = function( $atts = array(), $content = '', $tag = '' ) use ( $original_callback, $shortcode_name ) {
         shortcode_cache_track_shortcode_execution( $shortcode_name );
-        return call_user_func( $original_callback, $atts );
+        return call_user_func( $original_callback, $atts, $content, $tag );
     };
 }
 

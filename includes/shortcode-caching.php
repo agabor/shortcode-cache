@@ -79,23 +79,20 @@ function shortcode_cache_should_use_cache( $shortcode_name, $configured_id = nul
 
 function shortcode_cache_generate_cache_key( $shortcode_name, $atts, $role_caching_enabled = false, $configured_id = null ) {
     $atts = (array) $atts;
-    $serialized = serialize( $atts );
 
-    if ( null !== $configured_id ) {
-        $serialized = $configured_id . '|' . $serialized;
-    } elseif ( isset( $atts['id'] ) && ! empty( $atts['id'] ) ) {
-        $serialized = $atts['id'] . '|' . $serialized;
+    $key = 'shortcode_' . $shortcode_name;
+
+    foreach ( $atts as $key => $value ) {
+            $key .= '_' .esc_html( $key ) . '|' . esc_html( $value );
     }
 
     if ( $role_caching_enabled ) {
         $current_user = wp_get_current_user();
         $user_role = ! empty( $current_user->roles ) ? $current_user->roles[0] : 'guest';
-        $serialized .= '|role:' . $user_role;
+        $key .= '_role|' . $user_role;
     }
 
-    $hash = md5( $serialized );
-
-    return 'shortcode_' . $shortcode_name . '_' . $hash;
+    return $key;
 }
 
 function shortcode_cache_track_cached_item( $cache_key, $shortcode_name, $atts, $role_caching_enabled = false, $configured_id = null ) {

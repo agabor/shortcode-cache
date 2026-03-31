@@ -29,10 +29,6 @@ function shortcode_cache_get_all_cached_items() {
 function shortcode_cache_extract_parameters_from_item( $item_data ) {
     $parts = array();
 
-    if ( isset( $item_data['id'] ) && ! empty( $item_data['id'] ) ) {
-        $parts[] = sprintf( 'id=%s', esc_html( $item_data['id'] ) );
-    }
-
     $parameters = isset( $item_data['parameters'] ) ? $item_data['parameters'] : array();
 
     if ( ! empty( $parameters ) ) {

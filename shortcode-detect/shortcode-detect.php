@@ -1,8 +1,8 @@
 <?php
 /**
- * Plugin Name: Shortcode Cache
- * Description: Cache rendered HTML for specific shortcodes
- * Version: 1.1.14
+ * Plugin Name: Shortcode Detect
+ * Description: Detect shortcodes for specific urls
+ * Version: 1.2.0
  * Author: Gabor Angyal
  * Author URI: https://webshop.tech
  * License: GPL v2 or later
@@ -29,8 +29,8 @@ add_action( 'wp', 'shortcode_detect_setup_detection', 999 );
 
 function shortcode_detect_register_admin_menu() {
     $hook_suffix = add_options_page(
-        __( 'Shortcode Cache Settings', 'shortcode-detect' ),
-        __( 'Shortcode Cache', 'shortcode-detect' ),
+        __( 'Shortcode Detect Settings', 'shortcode-detect' ),
+        __( 'Shortcode Detect', 'shortcode-detect' ),
         'manage_options',
         'shortcode-detect-settings',
         'shortcode_detect_render_settings_page'
@@ -44,7 +44,7 @@ function shortcode_detect_enqueue_admin_scripts() {
         'shortcode-detect-manager',
         SHORTCODE_DETECT_URL . 'admin/js/cache-manager.js',
         array( 'jquery' ),
-        '1.1.14',
+        '1.2.0',
         true
     );
 
@@ -52,7 +52,7 @@ function shortcode_detect_enqueue_admin_scripts() {
         'shortcode-detect-settings-manager',
         SHORTCODE_DETECT_URL . 'admin/css/settings-manager.css',
         array(),
-        '1.1.14'
+        '1.2.0'
     );
 
     wp_localize_script(

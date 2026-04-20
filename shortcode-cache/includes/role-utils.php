@@ -14,7 +14,8 @@ function shortcode_cache_get_all_roles() {
     $roles = array();
 
     foreach ( $wp_roles->roles as $role_slug => $role_data ) {
-        $roles[ $role_slug ] = $role_data['name'];
+        if (in_array($role_slug, ['customer', 'bronze_users', 'silver_users', 'gold_users', 'diamond_users', 'markanagykovet-30']))
+            $roles[$role_slug] = $role_data['name'];
     }
 
     return $roles;

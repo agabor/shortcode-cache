@@ -52,7 +52,45 @@ function shortcode_detect_get_detected_shortcodes() {
     return $detected;
 }
 
-
 function shortcode_detect_clear_detected_shortcodes() {
     delete_transient( 'shortcode_detect_detected_shortcodes' );
+}
+
+function shortcode_detect_set_shortcode_time( $shortcode_name, $instance_id, $execution_time ) {
+    $times = get_transient( 'shortcode_detect_execution_times' );
+
+    if ( false === $times ) {
+        $times = array();
+    }
+
+    if ( ! is_array( $times ) ) {
+        $times = array();
+    }
+
+    $key = $shortcode_name;
+    if ( null !== $instance_id && ! empty( $instance_id ) ) {
+        $key = $shortcode_name . '::' . $instance_id;
+    }
+
+    if ( ! isset( $times[ $key ] ) ) {
+        $times[ $key ] = array();
+    }
+
+    $times[ $key ][] = $execution_time;
+
+    set_transient( 'shortcode_detect_execution_times', $times, WEEK_IN_SECONDS );
+}
+
+function shortcode_detect_get_shortcode_times() {
+    $times = get_transient( 'shortcode_detect_execution_times' );
+
+    if ( false === $times || ! is_array( $times ) ) {
+        return array();
+    }
+
+    return $times;
+}
+
+function shortcode_detect_clear_shortcode_times() {
+    delete_transient( 'shortcode_detect_execution_times' );
 }

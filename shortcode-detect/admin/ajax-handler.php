@@ -10,6 +10,7 @@ function shortcode_detect_handle_clear_detected_shortcodes() {
     }
 
     shortcode_detect_clear_detected_shortcodes();
+    shortcode_detect_clear_shortcode_times();
 
     wp_send_json_success( array( 'message' => __( 'Detected shortcodes cleared successfully', 'shortcode-detect' ) ) );
 }

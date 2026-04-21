@@ -7,8 +7,9 @@ if ( ! defined( 'ABSPATH' ) ) {
 $monitored_url = shortcode_detect_get_monitored_url();
 $show_success = isset( $_GET['settings-updated'] ) && $_GET['settings-updated'];
 $detected_shortcodes = shortcode_detect_get_detected_shortcodes();
+$execution_times = shortcode_detect_get_shortcode_times();
 
-$parsed_detected = shortcode_detect_parse_detected_shortcodes( $detected_shortcodes );
+$parsed_detected = shortcode_detect_parse_detected_shortcodes( $detected_shortcodes, $execution_times );
 usort( $parsed_detected, function( $a, $b ) {
     return strcmp( $a['name'], $b['name'] );
 } );
@@ -76,6 +77,7 @@ usort( $parsed_detected, function( $a, $b ) {
                     <th scope="col"><?php esc_html_e( 'Shortcode Name', 'shortcode-detect' ); ?></th>
                     <th scope="col"><?php esc_html_e( 'ID', 'shortcode-detect' ); ?></th>
                     <th scope="col"><?php esc_html_e( 'Usage Count', 'shortcode-detect' ); ?></th>
+                    <th scope="col"><?php esc_html_e( 'Rendering Time (ms)', 'shortcode-detect' ); ?></th>
                 </tr>
             </thead>
             <tbody>
@@ -84,6 +86,7 @@ usort( $parsed_detected, function( $a, $b ) {
                         <td><?php echo esc_html( $shortcode_data['name'] ); ?></td>
                         <td><?php echo ! empty( $shortcode_data['id'] ) ? esc_html( $shortcode_data['id'] ) : '—'; ?></td>
                         <td><?php echo esc_html( $shortcode_data['count'] ); ?></td>
+                        <td><?php echo esc_html( number_format( $shortcode_data['avg_time'], 2 ) ); ?></td>
                     </tr>
                 <?php endforeach; ?>
             </tbody>
@@ -92,15 +95,22 @@ usort( $parsed_detected, function( $a, $b ) {
 </div>
 
 <?php
-function shortcode_detect_parse_detected_shortcodes( $detected_shortcodes ) {
+function shortcode_detect_parse_detected_shortcodes( $detected_shortcodes, $execution_times = array() ) {
     $parsed = array();
 
     foreach ( $detected_shortcodes as $key => $count ) {
+        $avg_time = 0;
+
+        if ( isset( $execution_times[ $key ] ) && is_array( $execution_times[ $key ] ) ) {
+            $avg_time = array_sum( $execution_times[ $key ] ) / count( $execution_times[ $key ] );
+        }
+
         if ( strpos( $key, '::' ) === false ) {
             $parsed[] = array(
                 'name' => $key,
                 'id' => '',
                 'count' => $count,
+                'avg_time' => $avg_time,
             );
         } else {
             list( $name, $id ) = explode( '::', $key, 2 );
@@ -108,6 +118,7 @@ function shortcode_detect_parse_detected_shortcodes( $detected_shortcodes ) {
                 'name' => $name,
                 'id' => $id,
                 'count' => $count,
+                'avg_time' => $avg_time,
             );
         }
     }

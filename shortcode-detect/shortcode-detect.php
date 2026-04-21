@@ -2,7 +2,7 @@
 /**
  * Plugin Name: Shortcode Detect
  * Description: Detect shortcodes for specific urls
- * Version: 1.3.1
+ * Version: 1.4.2
  * Author: Gabor Angyal
  * Author URI: https://webshop.tech
  * License: GPL v2 or later
@@ -44,7 +44,7 @@ function shortcode_detect_enqueue_admin_scripts() {
         'shortcode-detect-manager',
         SHORTCODE_DETECT_URL . 'admin/js/cache-manager.js',
         array( 'jquery' ),
-        '1.3.1',
+        '1.4.2',
         true
     );
 
@@ -52,7 +52,7 @@ function shortcode_detect_enqueue_admin_scripts() {
         'shortcode-detect-settings-manager',
         SHORTCODE_DETECT_URL . 'admin/css/settings-manager.css',
         array(),
-        '1.3.1'
+        '1.4.2'
     );
 
     wp_localize_script(
@@ -102,12 +102,20 @@ function shortcode_detect_wrap_shortcode_for_detection( $shortcode_name ) {
 
     $shortcode_tags[ $shortcode_name ] = function( $atts = array(), $content = '', $tag = '' ) use ( $original_callback, $shortcode_name ) {
         $instance_id = isset( $atts['id'] ) ? $atts['id'] : null;
-        shortcode_detect_track_shortcode_execution( $shortcode_name, $instance_id );
-        return call_user_func( $original_callback, $atts, $content, $tag );
+        
+        $start_time = microtime( true );
+        $result = call_user_func( $original_callback, $atts, $content, $tag );
+        $end_time = microtime( true );
+        
+        $execution_time = ( $end_time - $start_time ) * 1000;
+        
+        shortcode_detect_track_shortcode_execution( $shortcode_name, $instance_id, $execution_time );
+        
+        return $result;
     };
 }
 
-function shortcode_detect_track_shortcode_execution( $shortcode_name, $instance_id = null ) {
+function shortcode_detect_track_shortcode_execution( $shortcode_name, $instance_id = null, $execution_time = 0 ) {
     $detected_shortcodes = get_transient( 'shortcode_detect_detected_shortcodes' );
 
     if ( false === $detected_shortcodes ) {
@@ -130,4 +138,8 @@ function shortcode_detect_track_shortcode_execution( $shortcode_name, $instance_
     $detected_shortcodes[ $key ]++;
 
     set_transient( 'shortcode_detect_detected_shortcodes', $detected_shortcodes, WEEK_IN_SECONDS );
+    
+    if ( $execution_time > 0 ) {
+        shortcode_detect_set_shortcode_time( $shortcode_name, $instance_id, $execution_time );
+    }
 }

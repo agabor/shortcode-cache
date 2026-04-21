@@ -12,7 +12,7 @@ function shortcode_cache_export_config_to_csv() {
     }
 
     $csv_lines = array();
-    $csv_lines[] = 'Shortcode Name,Id,Cache By Role,Note';
+    $csv_lines[] = 'Shortcode Name,Id,Cache By Role,Cache By Page,Note';
 
     foreach ( $config as $item ) {
         if ( ! isset( $item['name'] ) ) {
@@ -22,13 +22,14 @@ function shortcode_cache_export_config_to_csv() {
         $name = isset( $item['name'] ) ? $item['name'] : '';
         $id = isset( $item['id'] ) ? $item['id'] : '';
         $cache_by_role = isset( $item['cache_by_role'] ) && $item['cache_by_role'] ? 'Yes' : 'No';
+        $cache_by_page = isset( $item['cache_by_page'] ) && $item['cache_by_page'] ? 'Yes' : 'No';
         $note = isset( $item['note'] ) ? $item['note'] : '';
 
         $name = str_replace( '"', '""', $name );
         $id = str_replace( '"', '""', $id );
         $note = str_replace( '"', '""', $note );
 
-        $csv_lines[] = '"' . $name . '","' . $id . '","' . $cache_by_role . '","' . $note . '"';
+        $csv_lines[] = '"' . $name . '","' . $id . '","' . $cache_by_role . '","' . $cache_by_page . '","' . $note . '"';
     }
 
     return implode( "\n", $csv_lines );
@@ -160,13 +161,19 @@ function shortcode_cache_validate_csv_row( $fields, $row_number ) {
 
     $id = isset( $fields[1] ) ? sanitize_text_field( $fields[1] ) : '';
     $cache_by_role = false;
+    $cache_by_page = false;
 
     if ( isset( $fields[2] ) ) {
         $cache_by_role_raw = strtolower( trim( $fields[2] ) );
         $cache_by_role = in_array( $cache_by_role_raw, array( 'yes', 'true', '1' ), true );
     }
 
-    $note = isset( $fields[3] ) ? sanitize_textarea_field( $fields[3] ) : '';
+    if ( isset( $fields[3] ) ) {
+        $cache_by_page_raw = strtolower( trim( $fields[3] ) );
+        $cache_by_page = in_array( $cache_by_page_raw, array( 'yes', 'true', '1' ), true );
+    }
+
+    $note = isset( $fields[4] ) ? sanitize_textarea_field( $fields[4] ) : '';
 
     return array(
         'valid' => true,
@@ -174,6 +181,7 @@ function shortcode_cache_validate_csv_row( $fields, $row_number ) {
             'name' => $name,
             'id' => $id,
             'cache_by_role' => $cache_by_role,
+            'cache_by_page' => $cache_by_page,
             'note' => $note,
         ),
     );

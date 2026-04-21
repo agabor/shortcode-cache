@@ -36,6 +36,12 @@
             }
         });
 
+        $(document).on('change', '.shortcode-cache-page-checkbox', function (e) {
+            const index = $(this).data('index');
+            const isChecked = $(this).prop('checked');
+            toggleShortcodePageCaching(index, isChecked);
+        });
+
         $(document).on('click', '.shortcode-cache-global-roles-btn', function (e) {
             e.preventDefault();
             openGlobalRoleSelectionDialog();
@@ -168,6 +174,28 @@
             },
             error: function () {
                 alert('An error occurred while updating role caching setting.');
+                location.reload();
+            },
+        });
+    }
+
+    function toggleShortcodePageCaching(index, isChecked) {
+        $.ajax({
+            url: shortcodeCacheData.ajaxUrl,
+            type: 'POST',
+            data: {
+                action: 'shortcode_cache_update_page_caching',
+                index: index,
+                cache_by_page: isChecked ? 1 : 0,
+            },
+            success: function (response) {
+                if (!response.success) {
+                    alert(response.data.message);
+                    location.reload();
+                }
+            },
+            error: function () {
+                alert('An error occurred while updating page caching setting.');
                 location.reload();
             },
         });

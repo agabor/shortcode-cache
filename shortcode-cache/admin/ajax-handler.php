@@ -65,6 +65,7 @@ function shortcode_cache_handle_add_shortcode() {
     $new_item = array(
         'name' => $shortcode_name,
         'cache_by_role' => false,
+        'cache_by_page' => false,
         'note' => $shortcode_note,
     );
 
@@ -130,6 +131,31 @@ function shortcode_cache_handle_update_shortcode_role_caching() {
     update_option( 'shortcode_cache_config', $config );
 
     wp_send_json_success( array( 'message' => __( 'Role caching setting updated successfully', 'shortcode-cache' ) ) );
+}
+
+function shortcode_cache_handle_update_shortcode_page_caching() {
+    if ( ! current_user_can( 'manage_options' ) ) {
+        wp_send_json_error( array( 'message' => __( 'Insufficient permissions', 'shortcode-cache' ) ) );
+    }
+
+    $index = isset( $_POST['index'] ) ? intval( $_POST['index'] ) : -1;
+    $cache_by_page = isset( $_POST['cache_by_page'] ) ? (bool) $_POST['cache_by_page'] : false;
+
+    if ( $index < 0 ) {
+        wp_send_json_error( array( 'message' => __( 'Invalid index', 'shortcode-cache' ) ) );
+    }
+
+    $config = get_option( 'shortcode_cache_config', array() );
+
+    if ( ! is_array( $config ) || ! isset( $config[ $index ] ) ) {
+        wp_send_json_error( array( 'message' => __( 'Shortcode not found', 'shortcode-cache' ) ) );
+    }
+
+    $config[ $index ]['cache_by_page'] = $cache_by_page;
+
+    update_option( 'shortcode_cache_config', $config );
+
+    wp_send_json_success( array( 'message' => __( 'Page caching setting updated successfully', 'shortcode-cache' ) ) );
 }
 
 function shortcode_cache_handle_update_global_roles() {

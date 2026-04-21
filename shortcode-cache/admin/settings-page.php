@@ -114,6 +114,7 @@ $all_roles = shortcode_cache_get_all_roles();
                     <th scope="col"><?php esc_html_e( 'Shortcode Name', 'shortcode-cache' ); ?></th>
                     <th scope="col"><?php esc_html_e( 'ID', 'shortcode-cache' ); ?></th>
                     <th scope="col" class="shortcode-cache-role-column"><?php esc_html_e( 'Cache by Role', 'shortcode-cache' ); ?></th>
+                    <th scope="col" class="shortcode-cache-page-column"><?php esc_html_e( 'Cache by Page', 'shortcode-cache' ); ?></th>
                     <th scope="col"><?php esc_html_e( 'Note', 'shortcode-cache' ); ?></th>
                     <th scope="col"><?php esc_html_e( 'Action', 'shortcode-cache' ); ?></th>
                 </tr>
@@ -139,6 +140,17 @@ $all_roles = shortcode_cache_get_all_roles();
                                     class="shortcode-cache-role-checkbox"
                                     data-index="<?php echo esc_attr( $index ); ?>"
                                     <?php checked( isset( $item['cache_by_role'] ) && $item['cache_by_role'] ); ?>
+                                />
+                                <span class="shortcode-cache-toggle-switch"></span>
+                            </label>
+                        </td>
+                        <td class="shortcode-cache-page-column">
+                            <label class="shortcode-cache-page-toggle">
+                                <input
+                                    type="checkbox"
+                                    class="shortcode-cache-page-checkbox"
+                                    data-index="<?php echo esc_attr( $index ); ?>"
+                                    <?php checked( isset( $item['cache_by_page'] ) && $item['cache_by_page'] ); ?>
                                 />
                                 <span class="shortcode-cache-toggle-switch"></span>
                             </label>
@@ -223,9 +235,9 @@ $all_roles = shortcode_cache_get_all_roles();
                     <p style="margin: 0 0 8px 0; font-weight: bold;">
                         <?php esc_html_e( 'CSV Format:', 'shortcode-cache' ); ?>
                     </p>
-                    <code style="display: block; margin-bottom: 8px;">Shortcode Name,Id,Cache By Role,Note</code>
+                    <code style="display: block; margin-bottom: 8px;">Shortcode Name,Id,Cache By Role,Cache By Page,Note</code>
                     <p style="margin: 0;">
-                        <?php esc_html_e( 'Example: "my_shortcode","homepage",Yes,"Used on homepage product section"', 'shortcode-cache' ); ?>
+                        <?php esc_html_e( 'Example: "my_shortcode","homepage",Yes,No,"Used on homepage product section"', 'shortcode-cache' ); ?>
                     </p>
                 </div>
             </div>

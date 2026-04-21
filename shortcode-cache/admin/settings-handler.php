@@ -39,6 +39,12 @@ function shortcode_cache_sanitize_shortcode_config( $value ) {
             $sanitized_item['cache_by_role'] = false;
         }
 
+        if ( isset( $item['cache_by_page'] ) ) {
+            $sanitized_item['cache_by_page'] = (bool) $item['cache_by_page'];
+        } else {
+            $sanitized_item['cache_by_page'] = false;
+        }
+
         if ( isset( $item['note'] ) ) {
             $sanitized_item['note'] = sanitize_textarea_field( $item['note'] );
         } else {

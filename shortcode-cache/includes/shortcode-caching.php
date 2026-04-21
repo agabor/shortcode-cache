@@ -22,7 +22,8 @@ function shortcode_cache_wrap_shortcode_with_cache( $shortcode_name, $shortcode_
         }
 
         $role_caching_enabled = shortcode_cache_is_role_caching_enabled_for_shortcode( $shortcode_name, $configured_id );
-        $cache_key = shortcode_cache_generate_cache_key($shortcode_name, $atts, $role_caching_enabled);
+        $page_caching_enabled = shortcode_cache_is_page_caching_enabled_for_shortcode( $shortcode_name, $configured_id );
+        $cache_key = shortcode_cache_generate_cache_key($shortcode_name, $atts, $role_caching_enabled, $page_caching_enabled);
         $group     = 'shortcode_cache';
 
         $output = shortcode_cache_get( $cache_key, $group );
@@ -30,7 +31,7 @@ function shortcode_cache_wrap_shortcode_with_cache( $shortcode_name, $shortcode_
         if ( false === $output ) {
             $output = call_user_func( $original_callback, $atts, $content, $tag );
             shortcode_cache_set( $cache_key, $output, $group, HOUR_IN_SECONDS );
-            shortcode_cache_track_cached_item( $cache_key, $shortcode_name, $atts, $role_caching_enabled, $configured_id );
+            shortcode_cache_track_cached_item( $cache_key, $shortcode_name, $atts, $role_caching_enabled, $page_caching_enabled, $configured_id );
         }
 
         return $output;
@@ -68,7 +69,7 @@ function shortcode_cache_should_use_cache($atts, $configured_id) {
     return false;
 }
 
-function shortcode_cache_generate_cache_key($shortcode_name, $atts, $role_caching_enabled) {
+function shortcode_cache_generate_cache_key($shortcode_name, $atts, $role_caching_enabled, $page_caching_enabled = false) {
     $atts = (array) $atts;
 
     $shortcode_key = 'shortcode_' . $shortcode_name;
@@ -83,10 +84,17 @@ function shortcode_cache_generate_cache_key($shortcode_name, $atts, $role_cachin
         $shortcode_key .= '_role|' . $user_role;
     }
 
+    if ( $page_caching_enabled ) {
+        $page_id = get_the_ID();
+        if ( $page_id ) {
+            $shortcode_key .= '_page|' . $page_id;
+        }
+    }
+
     return $shortcode_key;
 }
 
-function shortcode_cache_track_cached_item( $cache_key, $shortcode_name, $atts, $role_caching_enabled, $configured_id ) {
+function shortcode_cache_track_cached_item( $cache_key, $shortcode_name, $atts, $role_caching_enabled, $page_caching_enabled, $configured_id ) {
     $cached_items = shortcode_cache_get_items();
 
     $instance_id = null;
@@ -110,6 +118,13 @@ function shortcode_cache_track_cached_item( $cache_key, $shortcode_name, $atts, 
         $current_user = wp_get_current_user();
         $user_role = ! empty( $current_user->roles ) ? $current_user->roles[0] : 'guest';
         $item_data['cached_for_role'] = $user_role;
+    }
+
+    if ( $page_caching_enabled ) {
+        $page_id = get_the_ID();
+        if ( $page_id ) {
+            $item_data['cached_for_page'] = $page_id;
+        }
     }
 
     $cached_items[ $cache_key ] = $item_data;

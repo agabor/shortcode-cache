@@ -39,6 +39,10 @@ function shortcode_cache_extract_parameters_from_item( $item_data ) {
         $parts[] = sprintf( 'role=%s', esc_html( $item_data['cached_for_role'] ) );
     }
 
+    if ( isset( $item_data['cached_for_page'] ) ) {
+        $parts[] = sprintf( 'page=%s', esc_html( $item_data['cached_for_page'] ) );
+    }
+
     if ( empty( $parts ) ) {
         return '—';
     }

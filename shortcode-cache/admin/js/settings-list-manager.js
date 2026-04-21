@@ -78,8 +78,10 @@
     function addShortcode() {
         const nameInput = $('.shortcode-cache-new-name');
         const idInput = $('.shortcode-cache-new-id');
+        const noteInput = $('.shortcode-cache-new-note');
         const shortcodeName = nameInput.val().trim();
         const shortcodeId = idInput.val().trim();
+        const shortcodeNote = noteInput.val().trim();
 
         if (!shortcodeName) {
             alert('Please enter a shortcode name');
@@ -97,6 +99,7 @@
                 action: 'shortcode_cache_add',
                 shortcode_name: shortcodeName,
                 shortcode_id: shortcodeId,
+                shortcode_note: shortcodeNote,
             },
             success: function (response) {
                 if (response.success) {

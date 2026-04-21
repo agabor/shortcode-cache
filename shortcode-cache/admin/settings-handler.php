@@ -39,6 +39,12 @@ function shortcode_cache_sanitize_shortcode_config( $value ) {
             $sanitized_item['cache_by_role'] = false;
         }
 
+        if ( isset( $item['note'] ) ) {
+            $sanitized_item['note'] = sanitize_textarea_field( $item['note'] );
+        } else {
+            $sanitized_item['note'] = '';
+        }
+
         if ( ! empty( $sanitized_item['name'] ) ) {
             $sanitized_config[] = $sanitized_item;
         }

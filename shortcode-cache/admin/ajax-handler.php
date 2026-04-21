@@ -41,6 +41,7 @@ function shortcode_cache_handle_add_shortcode() {
 
     $shortcode_name = isset( $_POST['shortcode_name'] ) ? sanitize_text_field( $_POST['shortcode_name'] ) : '';
     $shortcode_id = isset( $_POST['shortcode_id'] ) ? sanitize_text_field( $_POST['shortcode_id'] ) : '';
+    $shortcode_note = isset( $_POST['shortcode_note'] ) ? sanitize_textarea_field( $_POST['shortcode_note'] ) : '';
 
     if ( empty( $shortcode_name ) ) {
         wp_send_json_error( array( 'message' => __( 'Shortcode name cannot be empty', 'shortcode-cache' ) ) );
@@ -64,6 +65,7 @@ function shortcode_cache_handle_add_shortcode() {
     $new_item = array(
         'name' => $shortcode_name,
         'cache_by_role' => false,
+        'note' => $shortcode_note,
     );
 
     if ( ! empty( $shortcode_id ) ) {
@@ -181,5 +183,85 @@ function shortcode_cache_handle_get_cached_content() {
 
     wp_send_json_success( array(
         'content' => $content,
+    ) );
+}
+
+function shortcode_cache_handle_export_csv() {
+    if ( ! current_user_can( 'manage_options' ) ) {
+        wp_send_json_error( array( 'message' => __( 'Insufficient permissions', 'shortcode-cache' ) ) );
+    }
+
+    $csv_content = shortcode_cache_export_config_to_csv();
+
+    wp_send_json_success( array(
+        'csv_content' => $csv_content,
+    ) );
+}
+
+function shortcode_cache_handle_import_csv() {
+    if ( ! current_user_can( 'manage_options' ) ) {
+        wp_send_json_error( array( 'message' => __( 'Insufficient permissions', 'shortcode-cache' ) ) );
+    }
+
+    if ( ! isset( $_FILES['csv_file'] ) ) {
+        wp_send_json_error( array( 'message' => __( 'No file uploaded', 'shortcode-cache' ) ) );
+    }
+
+    $file = $_FILES['csv_file'];
+    $file_name = $file['name'];
+    $file_error = $file['error'];
+    $file_tmp = $file['tmp_name'];
+
+    if ( $file_error !== UPLOAD_ERR_OK ) {
+        wp_send_json_error( array( 'message' => __( 'File upload error', 'shortcode-cache' ) ) );
+    }
+
+    $file_extension = pathinfo( $file_name, PATHINFO_EXTENSION );
+
+    if ( strtolower( $file_extension ) !== 'csv' ) {
+        wp_send_json_error( array( 'message' => __( 'Only CSV files are allowed', 'shortcode-cache' ) ) );
+    }
+
+    $csv_content = file_get_contents( $file_tmp );
+
+    if ( false === $csv_content ) {
+        wp_send_json_error( array( 'message' => __( 'Failed to read file', 'shortcode-cache' ) ) );
+    }
+
+    $import_result = shortcode_cache_import_config_from_csv( $csv_content );
+
+    if ( ! $import_result['success'] ) {
+        wp_send_json_error( array( 'message' => $import_result['message'] ) );
+    }
+
+    $imported_config = $import_result['config'];
+    $current_config = get_option( 'shortcode_cache_config', array() );
+
+    if ( ! is_array( $current_config ) ) {
+        $current_config = array();
+    }
+
+    $merge_mode = isset( $_POST['merge_mode'] ) ? sanitize_text_field( $_POST['merge_mode'] ) : 'replace';
+
+    if ( 'replace' === $merge_mode ) {
+        $final_config = $imported_config;
+    } else {
+        $final_config = array_merge( $current_config, $imported_config );
+    }
+
+    update_option( 'shortcode_cache_config', $final_config );
+
+    $warning_message = '';
+
+    if ( ! empty( $import_result['errors'] ) ) {
+        $warning_message = ' ' . sprintf(
+            __( 'Some rows were skipped: %s', 'shortcode-cache' ),
+            implode( ' | ', $import_result['errors'] )
+        );
+    }
+
+    wp_send_json_success( array(
+        'message' => $import_result['message'] . $warning_message,
+        'imported_count' => count( $imported_config ),
     ) );
 }

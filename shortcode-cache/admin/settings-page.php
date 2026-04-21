@@ -59,7 +59,7 @@ $all_roles = shortcode_cache_get_all_roles();
     <h2><?php esc_html_e( 'Shortcodes to Cache', 'shortcode-cache' ); ?></h2>
 
     <div class="shortcode-cache-add-form" style="background: #f9f9f9; padding: 15px; border: 1px solid #ddd; border-radius: 4px; margin-bottom: 20px;">
-        <div style="display: grid; grid-template-columns: 1fr 1fr auto; gap: 10px; align-items: flex-end;">
+        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 10px;">
             <div>
                 <label for="shortcode_cache_new_name" style="display: block; margin-bottom: 5px; font-weight: bold;">
                     <?php esc_html_e( 'Shortcode Name', 'shortcode-cache' ); ?>
@@ -82,6 +82,20 @@ $all_roles = shortcode_cache_get_all_roles();
                     placeholder="<?php esc_attr_e( 'e.g., homepage-products', 'shortcode-cache' ); ?>"
                 />
             </div>
+        </div>
+        <div style="display: grid; grid-template-columns: 1fr auto; gap: 10px; align-items: flex-end;">
+            <div>
+                <label for="shortcode_cache_new_note" style="display: block; margin-bottom: 5px; font-weight: bold;">
+                    <?php esc_html_e( 'Note (optional)', 'shortcode-cache' ); ?>
+                </label>
+                <textarea
+                    id="shortcode_cache_new_note"
+                    class="regular-text shortcode-cache-new-note"
+                    placeholder="<?php esc_attr_e( 'e.g., Used on homepage product section', 'shortcode-cache' ); ?>"
+                    rows="2"
+                    style="resize: vertical;"
+                ></textarea>
+            </div>
             <button
                 type="button"
                 class="button button-primary shortcode-cache-add-btn"
@@ -100,6 +114,7 @@ $all_roles = shortcode_cache_get_all_roles();
                     <th scope="col"><?php esc_html_e( 'Shortcode Name', 'shortcode-cache' ); ?></th>
                     <th scope="col"><?php esc_html_e( 'ID', 'shortcode-cache' ); ?></th>
                     <th scope="col" class="shortcode-cache-role-column"><?php esc_html_e( 'Cache by Role', 'shortcode-cache' ); ?></th>
+                    <th scope="col"><?php esc_html_e( 'Note', 'shortcode-cache' ); ?></th>
                     <th scope="col"><?php esc_html_e( 'Action', 'shortcode-cache' ); ?></th>
                 </tr>
             </thead>
@@ -129,6 +144,18 @@ $all_roles = shortcode_cache_get_all_roles();
                             </label>
                         </td>
                         <td>
+                            <span class="shortcode-cache-item-note" title="<?php echo isset( $item['note'] ) && ! empty( $item['note'] ) ? esc_attr( $item['note'] ) : ''; ?>">
+                                <?php
+                                if ( isset( $item['note'] ) && ! empty( $item['note'] ) ) {
+                                    $note_display = strlen( $item['note'] ) > 50 ? substr( $item['note'], 0, 50 ) . '...' : $item['note'];
+                                    echo esc_html( $note_display );
+                                } else {
+                                    echo '—';
+                                }
+                                ?>
+                            </span>
+                        </td>
+                        <td>
                             <button
                                 type="button"
                                 class="button button-small button-danger shortcode-cache-delete-btn"
@@ -142,6 +169,70 @@ $all_roles = shortcode_cache_get_all_roles();
             </tbody>
         </table>
     <?php endif; ?>
+
+    <hr />
+
+    <h2><?php esc_html_e( 'Import/Export Configuration', 'shortcode-cache' ); ?></h2>
+
+    <div class="shortcode-cache-csv-section" style="background: #f9f9f9; padding: 15px; border: 1px solid #ddd; border-radius: 4px; margin-bottom: 20px;">
+        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px;">
+            <div>
+                <p style="margin: 0 0 10px 0; font-weight: bold;">
+                    <?php esc_html_e( 'Export Configuration', 'shortcode-cache' ); ?>
+                </p>
+                <p class="description">
+                    <?php esc_html_e( 'Download your current shortcode configuration as a CSV file.', 'shortcode-cache' ); ?>
+                </p>
+                <button
+                    type="button"
+                    class="button button-secondary shortcode-cache-export-csv-btn"
+                    style="margin-top: 10px;"
+                >
+                    <?php esc_html_e( 'Download CSV', 'shortcode-cache' ); ?>
+                </button>
+            </div>
+
+            <div>
+                <p style="margin: 0 0 10px 0; font-weight: bold;">
+                    <?php esc_html_e( 'Import Configuration', 'shortcode-cache' ); ?>
+                </p>
+                <p class="description">
+                    <?php esc_html_e( 'Upload a CSV file to import shortcode configurations.', 'shortcode-cache' ); ?>
+                </p>
+                <form class="shortcode-cache-csv-import-form" style="margin-top: 10px;">
+                    <div style="display: flex; gap: 10px; margin-bottom: 10px;">
+                        <input
+                            type="file"
+                            accept=".csv"
+                            class="shortcode-cache-csv-file-input"
+                            required
+                        />
+                        <select class="shortcode-cache-csv-merge-mode" style="padding: 5px;">
+                            <option value="replace"><?php esc_html_e( 'Replace All', 'shortcode-cache' ); ?></option>
+                            <option value="merge"><?php esc_html_e( 'Merge', 'shortcode-cache' ); ?></option>
+                        </select>
+                    </div>
+                    <button
+                        type="submit"
+                        class="button button-primary"
+                    >
+                        <?php esc_html_e( 'Import CSV', 'shortcode-cache' ); ?>
+                    </button>
+                </form>
+                <div class="shortcode-cache-csv-format-help" style="margin-top: 15px; font-size: 12px; background: white; padding: 10px; border: 1px solid #ddd; border-radius: 3px;">
+                    <p style="margin: 0 0 8px 0; font-weight: bold;">
+                        <?php esc_html_e( 'CSV Format:', 'shortcode-cache' ); ?>
+                    </p>
+                    <code style="display: block; margin-bottom: 8px;">Shortcode Name,Id,Cache By Role,Note</code>
+                    <p style="margin: 0;">
+                        <?php esc_html_e( 'Example: "my_shortcode","homepage",Yes,"Used on homepage product section"', 'shortcode-cache' ); ?>
+                    </p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="shortcode-cache-csv-message" style="display: none;"></div>
 
     <hr />
 

@@ -25,6 +25,8 @@ function shortcode_cache_handle_clear_cache() {
 }
 
 function shortcode_cache_handle_clear_all_cache() {
+    check_ajax_referer( 'shortcode_cache_nonce', 'nonce' );
+
     if ( ! current_user_can( 'manage_options' ) ) {
         wp_send_json_error( array( 'message' => __( 'Insufficient permissions', 'shortcode-cache' ) ) );
     }

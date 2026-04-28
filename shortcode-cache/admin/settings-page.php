@@ -4,6 +4,18 @@ if ( ! defined( 'ABSPATH' ) ) {
     exit;
 }
 
+$default_selected_roles = array(
+    'customer',
+    'bronze_users',
+    'silver_users',
+    'gold_users',
+    'diamond_users',
+    'markanagykovet-30',
+    'markanagykovet-40',
+    'markanagykovet_50',
+    'markanagykovet_35'
+);
+
 $config = get_option( 'shortcode_cache_config', array() );
 $global_allowed_roles = shortcode_cache_get_global_allowed_roles();
 $show_success = isset( $_GET['settings-updated'] ) && $_GET['settings-updated'];
@@ -322,6 +334,8 @@ $all_roles = shortcode_cache_get_all_roles();
                             type="checkbox"
                             class="shortcode-cache-role-checkbox"
                             value="<?php echo esc_attr( $role_slug ); ?>"
+                            <?php checked( in_array( $role_slug, $default_selected_roles, true ) ); ?>
+                            disabled
                         />
                         <span><?php echo esc_html( $role_name ); ?></span>
                     </label>
@@ -332,7 +346,7 @@ $all_roles = shortcode_cache_get_all_roles();
             <button type="button" class="button shortcode-cache-modal-cancel">
                 <?php esc_html_e( 'Cancel', 'shortcode-cache' ); ?>
             </button>
-            <button type="button" class="button button-primary shortcode-cache-modal-save">
+            <button type="button" class="button button-primary shortcode-cache-modal-save" disabled>
                 <?php esc_html_e( 'Save Roles', 'shortcode-cache' ); ?>
             </button>
         </div>

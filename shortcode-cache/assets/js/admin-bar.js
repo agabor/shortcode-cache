@@ -11,7 +11,7 @@
                 url: shortcodeCacheAdminBar.ajaxUrl,
                 type: 'POST',
                 data: {
-                    action: 'shortcode_cache_clear_all_cache',
+                    action: 'shortcode_cache_clear_all',
                 },
                 success: function(response) {
                     if (response.success) {

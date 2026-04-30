@@ -12,7 +12,6 @@
                 type: 'POST',
                 data: {
                     action: 'shortcode_cache_clear_all_cache',
-                    nonce: shortcodeCacheAdminBar.nonce,
                 },
                 success: function(response) {
                     if (response.success) {

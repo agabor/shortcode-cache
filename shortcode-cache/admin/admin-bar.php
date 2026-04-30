@@ -56,7 +56,6 @@ function shortcode_cache_enqueue_admin_bar_scripts() {
         'shortcodeCacheAdminBar',
         array(
             'ajaxUrl' => admin_url( 'admin-ajax.php' ),
-            'nonce'   => wp_create_nonce( 'shortcode_cache_nonce' ),
         )
     );
 }

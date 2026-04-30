@@ -2,7 +2,7 @@
 /**
  * Plugin Name: Shortcode Cache
  * Description: Cache rendered HTML for specific shortcodes
- * Version: 1.4.2
+ * Version: 1.5.0
  * Author: Gabor Angyal
  * Author URI: https://webshop.tech
  * License: GPL v2 or later
@@ -58,7 +58,7 @@ function shortcode_cache_enqueue_admin_scripts() {
         'shortcode-cache-manager',
         SHORTCODE_CACHE_URL . 'admin/js/cache-manager.js',
         array( 'jquery' ),
-        '1.4.2',
+        '1.5.0',
         true
     );
 
@@ -66,7 +66,7 @@ function shortcode_cache_enqueue_admin_scripts() {
         'shortcode-cache-settings-manager',
         SHORTCODE_CACHE_URL . 'admin/js/settings-list-manager.js',
         array( 'jquery' ),
-        '1.4.2',
+        '1.5.0',
         true
     );
 
@@ -74,7 +74,7 @@ function shortcode_cache_enqueue_admin_scripts() {
         'shortcode-cache-csv-manager',
         SHORTCODE_CACHE_URL . 'admin/js/csv-manager.js',
         array( 'jquery' ),
-        '1.4.2',
+        '1.5.0',
         true
     );
 
@@ -82,7 +82,7 @@ function shortcode_cache_enqueue_admin_scripts() {
         'shortcode-cache-settings-manager',
         SHORTCODE_CACHE_URL . 'admin/css/settings-manager.css',
         array(),
-        '1.4.2'
+        '1.5.0'
     );
 
     wp_localize_script(

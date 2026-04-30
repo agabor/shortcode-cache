@@ -2,7 +2,7 @@
 /**
  * Plugin Name: Shortcode Detect
  * Description: Detect shortcodes for specific urls
- * Version: 1.4.2
+ * Version: 1.5.0
  * Author: Gabor Angyal
  * Author URI: https://webshop.tech
  * License: GPL v2 or later
@@ -44,7 +44,7 @@ function shortcode_detect_enqueue_admin_scripts() {
         'shortcode-detect-manager',
         SHORTCODE_DETECT_URL . 'admin/js/cache-manager.js',
         array( 'jquery' ),
-        '1.4.2',
+        '1.5.0',
         true
     );
 
@@ -52,7 +52,7 @@ function shortcode_detect_enqueue_admin_scripts() {
         'shortcode-detect-settings-manager',
         SHORTCODE_DETECT_URL . 'admin/css/settings-manager.css',
         array(),
-        '1.4.2'
+        '1.5.0'
     );
 
     wp_localize_script(

@@ -1,5 +1,3 @@
-// Inspects and manages cached shortcode items
-
 <?php
 
 if ( ! defined( 'ABSPATH' ) ) {

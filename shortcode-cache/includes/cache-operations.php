@@ -28,12 +28,6 @@ function shortcode_cache_delete( $cache_key, $group ) {
     return delete_transient( $cache_key );
 }
 
-function shortcode_cache_flush() {
-    if ( wp_using_ext_object_cache() ) {
-        wp_cache_flush();
-    }
-}
-
 function shortcode_cache_get_size( $cache_key, $group ) {
     $content = shortcode_cache_get( $cache_key, $group );
 

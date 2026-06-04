@@ -1,3 +1,5 @@
+// Inspects and manages cached shortcode items
+
 <?php
 
 if ( ! defined( 'ABSPATH' ) ) {
@@ -74,7 +76,6 @@ function shortcode_cache_clear_all_cache() {
         shortcode_cache_delete( $cache_key, 'shortcode_cache' );
     }
     
-    shortcode_cache_flush();
     shortcode_cache_delete_items();
 }
 

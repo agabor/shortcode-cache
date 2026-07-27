@@ -2,7 +2,7 @@
 /**
  * Plugin Name: Shortcode Cache
  * Description: Cache rendered HTML for specific shortcodes
- * Version: 1.5.5
+ * Version: 1.5.6
  * Author: Gabor Angyal
  * Author URI: https://webshop.tech
  * License: GPL v2 or later
@@ -17,7 +17,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 
 define( 'SHORTCODE_CACHE_DIR', plugin_dir_path( __FILE__ ) );
 define( 'SHORTCODE_CACHE_URL', plugin_dir_url( __FILE__ ) );
-const SHORTCODE_CACHE_VERSION = '1.5.5';
+const SHORTCODE_CACHE_VERSION = '1.5.6';
 const SHORTCODE_CACHE_PLUGIN_URL = SHORTCODE_CACHE_URL;
 
 require_once SHORTCODE_CACHE_DIR . 'includes/cache-operations.php';

@@ -22,6 +22,14 @@ $show_success = isset( $_GET['settings-updated'] ) && $_GET['settings-updated'];
 $cached_items = shortcode_cache_get_all_cached_items();
 $all_roles = shortcode_cache_get_all_roles();
 
+function shortcode_cache_get_item_role( $item_data ) {
+    if ( isset( $item_data['cached_for_role'] ) ) {
+        return $item_data['cached_for_role'];
+    }
+
+    return '';
+}
+
 $grouped_items = array();
 foreach ( $cached_items as $cache_key => $item_data ) {
     $shortcode_name = $item_data['shortcode'];
@@ -30,10 +38,19 @@ foreach ( $cached_items as $cache_key => $item_data ) {
     } else {
         $group_name = $shortcode_name;
     }
+
+    $role_value = shortcode_cache_get_item_role( $item_data );
+    $role_key = ! empty( $role_value ) ? $role_value : '__no_role__';
+
     if ( ! isset( $grouped_items[ $group_name ] ) ) {
         $grouped_items[ $group_name ] = array();
     }
-    $grouped_items[ $group_name ][ $cache_key ] = $item_data;
+
+    if ( ! isset( $grouped_items[ $group_name ][ $role_key ] ) ) {
+        $grouped_items[ $group_name ][ $role_key ] = array();
+    }
+
+    $grouped_items[ $group_name ][ $role_key ][ $cache_key ] = $item_data;
 }
 ?>
 
@@ -289,56 +306,83 @@ foreach ( $cached_items as $cache_key => $item_data ) {
         </div>
 
         <div id="shortcode-cache-cached-accordion">
-            <?php foreach ( $grouped_items as $group_name => $group_items ) : ?>
+            <?php foreach ( $grouped_items as $group_name => $role_groups ) : ?>
+                <?php
+                $all_group_cache_keys = array();
+                $total_group_count = 0;
+                foreach ( $role_groups as $role_items ) {
+                    $total_group_count += count( $role_items );
+                    $all_group_cache_keys = array_merge( $all_group_cache_keys, array_keys( $role_items ) );
+                }
+                ?>
                 <h3 class="shortcode-cache-group-header">
-                    <?php echo esc_html( $group_name ); ?> (<?php echo esc_html( count( $group_items ) ); ?>)
+                    <?php echo esc_html( $group_name ); ?> (<?php echo esc_html( $total_group_count ); ?>)
                     <button
                         type="button"
                         class="button button-small shortcode-cache-clear-group-btn"
-                        data-cache-keys="<?php echo esc_attr( wp_json_encode( array_keys( $group_items ) ) ); ?>"
+                        data-cache-keys="<?php echo esc_attr( wp_json_encode( $all_group_cache_keys ) ); ?>"
                     >
                         <?php esc_html_e( 'Clear Group Cache', 'shortcode-cache' ); ?>
                     </button>
                 </h3>
                 <div class="shortcode-cache-group-panel">
-                    <table class="wp-list-table widefat striped">
-                        <thead>
-                            <tr>
-                                <th scope="col"><?php esc_html_e( 'ID', 'shortcode-cache' ); ?></th>
-                                <th scope="col"><?php esc_html_e( 'Parameters', 'shortcode-cache' ); ?></th>
-                                <th scope="col"><?php esc_html_e( 'Size', 'shortcode-cache' ); ?></th>
-                                <th scope="col"><?php esc_html_e( 'Content', 'shortcode-cache' ); ?></th>
-                                <th scope="col"><?php esc_html_e( 'Action', 'shortcode-cache' ); ?></th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            <?php foreach ( $group_items as $cache_key => $item_data ) : ?>
-                                <tr>
-                                    <td><?php echo isset( $item_data['id'] ) && ! empty( $item_data['id'] ) ? esc_html( $item_data['id'] ) : '—'; ?></td>
-                                    <td><?php echo shortcode_cache_extract_parameters_from_item( $item_data ); ?></td>
-                                    <td><?php echo esc_html( shortcode_cache_format_bytes( shortcode_cache_get_size( $cache_key, 'shortcode_cache' ) ) ); ?></td>
-                                    <td>
-                                        <button
-                                            type="button"
-                                            class="button button-small shortcode-cache-view-content-btn"
-                                            data-cache-key="<?php echo esc_attr( $cache_key ); ?>"
-                                        >
-                                            <?php esc_html_e( 'View Content', 'shortcode-cache' ); ?>
-                                        </button>
-                                    </td>
-                                    <td>
-                                        <button
-                                            type="button"
-                                            class="button button-small shortcode-cache-clear-btn"
-                                            data-cache-key="<?php echo esc_attr( $cache_key ); ?>"
-                                        >
-                                            <?php esc_html_e( 'Clear Cache', 'shortcode-cache' ); ?>
-                                        </button>
-                                    </td>
-                                </tr>
-                            <?php endforeach; ?>
-                        </tbody>
-                    </table>
+                    <?php foreach ( $role_groups as $role_key => $role_items ) : ?>
+                        <?php
+                        $role_label = ( '__no_role__' === $role_key )
+                            ? __( 'No Role', 'shortcode-cache' )
+                            : ( isset( $all_roles[ $role_key ] ) ? $all_roles[ $role_key ] : $role_key );
+                        ?>
+                        <div class="shortcode-cache-role-subgroup">
+                            <h4 class="shortcode-cache-role-subheader">
+                                <?php echo esc_html( $role_label ); ?> (<?php echo esc_html( count( $role_items ) ); ?>)
+                                <button
+                                    type="button"
+                                    class="button button-small shortcode-cache-clear-role-group-btn"
+                                    data-cache-keys="<?php echo esc_attr( wp_json_encode( array_keys( $role_items ) ) ); ?>"
+                                >
+                                    <?php esc_html_e( 'Clear Role Group Cache', 'shortcode-cache' ); ?>
+                                </button>
+                            </h4>
+                            <table class="wp-list-table widefat striped">
+                                <thead>
+                                    <tr>
+                                        <th scope="col"><?php esc_html_e( 'ID', 'shortcode-cache' ); ?></th>
+                                        <th scope="col"><?php esc_html_e( 'Parameters', 'shortcode-cache' ); ?></th>
+                                        <th scope="col"><?php esc_html_e( 'Size', 'shortcode-cache' ); ?></th>
+                                        <th scope="col"><?php esc_html_e( 'Content', 'shortcode-cache' ); ?></th>
+                                        <th scope="col"><?php esc_html_e( 'Action', 'shortcode-cache' ); ?></th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <?php foreach ( $role_items as $cache_key => $item_data ) : ?>
+                                        <tr>
+                                            <td><?php echo isset( $item_data['id'] ) && ! empty( $item_data['id'] ) ? esc_html( $item_data['id'] ) : '—'; ?></td>
+                                            <td><?php echo shortcode_cache_extract_parameters_from_item( $item_data ); ?></td>
+                                            <td><?php echo esc_html( shortcode_cache_format_bytes( shortcode_cache_get_size( $cache_key, 'shortcode_cache' ) ) ); ?></td>
+                                            <td>
+                                                <button
+                                                    type="button"
+                                                    class="button button-small shortcode-cache-view-content-btn"
+                                                    data-cache-key="<?php echo esc_attr( $cache_key ); ?>"
+                                                >
+                                                    <?php esc_html_e( 'View Content', 'shortcode-cache' ); ?>
+                                                </button>
+                                            </td>
+                                            <td>
+                                                <button
+                                                    type="button"
+                                                    class="button button-small shortcode-cache-clear-btn"
+                                                    data-cache-key="<?php echo esc_attr( $cache_key ); ?>"
+                                                >
+                                                    <?php esc_html_e( 'Clear Cache', 'shortcode-cache' ); ?>
+                                                </button>
+                                            </td>
+                                        </tr>
+                                    <?php endforeach; ?>
+                                </tbody>
+                            </table>
+                        </div>
+                    <?php endforeach; ?>
                 </div>
             <?php endforeach; ?>
         </div>

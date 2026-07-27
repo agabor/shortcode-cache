@@ -75,6 +75,45 @@
             });
         });
 
+        $(document).on('click', '.shortcode-cache-clear-group-btn', function (e) {
+            e.preventDefault();
+            e.stopPropagation();
+
+            const button = $(this);
+
+            if ( ! confirm( 'Are you sure you want to clear all cached items in this group? This action cannot be undone.' ) ) {
+                return;
+            }
+
+            const cacheKeys = button.data('cache-keys');
+
+            button.prop('disabled', true);
+            button.text('Clearing...');
+
+            $.ajax({
+                url: shortcodeCacheData.ajaxUrl,
+                type: 'POST',
+                data: {
+                    action: 'shortcode_cache_clear_group',
+                    cache_keys: cacheKeys,
+                },
+                success: function (response) {
+                    if (response.success) {
+                        location.reload();
+                    } else {
+                        button.prop('disabled', false);
+                        button.text('Clear Group Cache');
+                        alert(response.data.message);
+                    }
+                },
+                error: function () {
+                    button.prop('disabled', false);
+                    button.text('Clear Group Cache');
+                    alert('An error occurred while clearing the group cache.');
+                },
+            });
+        });
+
         $(document).on('click', '.shortcode-cache-clear-detected-btn', function (e) {
             e.preventDefault();
 

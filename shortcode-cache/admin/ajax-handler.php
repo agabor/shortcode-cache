@@ -34,6 +34,42 @@ function shortcode_cache_handle_clear_all_cache() {
     wp_send_json_success( array( 'message' => __( 'All cache cleared successfully', 'shortcode-cache' ) ) );
 }
 
+function shortcode_cache_handle_clear_group_cache() {
+    if ( ! current_user_can( 'manage_options' ) ) {
+        wp_send_json_error( array( 'message' => __( 'Insufficient permissions', 'shortcode-cache' ) ) );
+    }
+
+    $cache_keys = isset( $_POST['cache_keys'] ) ? (array) $_POST['cache_keys'] : array();
+
+    if ( empty( $cache_keys ) ) {
+        wp_send_json_error( array( 'message' => __( 'No cache keys provided', 'shortcode-cache' ) ) );
+    }
+
+    $cleared_count = 0;
+
+    foreach ( $cache_keys as $cache_key ) {
+        $cache_key = sanitize_text_field( $cache_key );
+
+        if ( empty( $cache_key ) ) {
+            continue;
+        }
+
+        $success = shortcode_cache_clear_specific_cache( $cache_key );
+
+        if ( $success ) {
+            $cleared_count++;
+        }
+    }
+
+    wp_send_json_success( array(
+        'message' => sprintf(
+            __( '%d cached item(s) cleared successfully', 'shortcode-cache' ),
+            $cleared_count
+        ),
+        'cleared_count' => $cleared_count,
+    ) );
+}
+
 function shortcode_cache_handle_add_shortcode() {
     if ( ! current_user_can( 'manage_options' ) ) {
         wp_send_json_error( array( 'message' => __( 'Insufficient permissions', 'shortcode-cache' ) ) );

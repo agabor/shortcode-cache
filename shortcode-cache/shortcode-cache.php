@@ -2,7 +2,7 @@
 /**
  * Plugin Name: Shortcode Cache
  * Description: Cache rendered HTML for specific shortcodes
- * Version: 1.5.4
+ * Version: 1.5.5
  * Author: Gabor Angyal
  * Author URI: https://webshop.tech
  * License: GPL v2 or later
@@ -17,7 +17,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 
 define( 'SHORTCODE_CACHE_DIR', plugin_dir_path( __FILE__ ) );
 define( 'SHORTCODE_CACHE_URL', plugin_dir_url( __FILE__ ) );
-const SHORTCODE_CACHE_VERSION = '1.5.4';
+const SHORTCODE_CACHE_VERSION = '1.5.5';
 const SHORTCODE_CACHE_PLUGIN_URL = SHORTCODE_CACHE_URL;
 
 require_once SHORTCODE_CACHE_DIR . 'includes/cache-operations.php';
@@ -34,6 +34,7 @@ add_action( 'admin_init', 'shortcode_cache_register_settings' );
 add_action( 'init', 'shortcode_cache_initialize_shortcode_caching', 20 );
 add_action( 'wp_ajax_shortcode_cache_clear', 'shortcode_cache_handle_clear_cache' );
 add_action( 'wp_ajax_shortcode_cache_clear_all', 'shortcode_cache_handle_clear_all_cache' );
+add_action( 'wp_ajax_shortcode_cache_clear_group', 'shortcode_cache_handle_clear_group_cache' );
 add_action( 'wp_ajax_shortcode_cache_add', 'shortcode_cache_handle_add_shortcode' );
 add_action( 'wp_ajax_shortcode_cache_delete', 'shortcode_cache_handle_delete_shortcode' );
 add_action( 'wp_ajax_shortcode_cache_update_role_caching', 'shortcode_cache_handle_update_shortcode_role_caching' );

@@ -396,6 +396,11 @@
     outline: none;
 }
 
+#shortcode-cache-cached-accordion .shortcode-cache-group-header .shortcode-cache-clear-group-btn {
+    float: right;
+    margin-top: -2px;
+}
+
 #shortcode-cache-cached-accordion .shortcode-cache-group-header.ui-accordion-header {
     background: #f1f1f1;
     border-radius: 0;

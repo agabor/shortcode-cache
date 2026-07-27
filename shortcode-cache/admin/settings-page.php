@@ -292,6 +292,13 @@ foreach ( $cached_items as $cache_key => $item_data ) {
             <?php foreach ( $grouped_items as $group_name => $group_items ) : ?>
                 <h3 class="shortcode-cache-group-header">
                     <?php echo esc_html( $group_name ); ?> (<?php echo esc_html( count( $group_items ) ); ?>)
+                    <button
+                        type="button"
+                        class="button button-small shortcode-cache-clear-group-btn"
+                        data-cache-keys="<?php echo esc_attr( wp_json_encode( array_keys( $group_items ) ) ); ?>"
+                    >
+                        <?php esc_html_e( 'Clear Group Cache', 'shortcode-cache' ); ?>
+                    </button>
                 </h3>
                 <div class="shortcode-cache-group-panel">
                     <table class="wp-list-table widefat striped">

@@ -4,7 +4,19 @@
     $(document).ready(function () {
         initializeListManager();
         loadAvailableRoles();
+        initializeCachedItemsAccordion();
     });
+
+    function initializeCachedItemsAccordion() {
+        if ($('#shortcode-cache-cached-accordion').length) {
+            $('#shortcode-cache-cached-accordion').accordion({
+                header: '.shortcode-cache-group-header',
+                collapsible: true,
+                active: false,
+                heightStyle: 'content',
+            });
+        }
+    }
 
     function initializeListManager() {
         $(document).on('click', '.shortcode-cache-add-btn', function (e) {

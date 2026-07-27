@@ -377,6 +377,58 @@
     margin-bottom: 20px;
 }
 
+#shortcode-cache-cached-accordion {
+    border: 1px solid #ddd;
+    border-radius: 4px;
+}
+
+#shortcode-cache-cached-accordion .shortcode-cache-group-header {
+    cursor: pointer;
+    padding: 12px 15px;
+    margin: 0;
+    background: #f1f1f1;
+    border: none;
+    border-bottom: 1px solid #ddd;
+    font-size: 14px;
+    font-weight: 600;
+    color: #23282d;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Oxygen-Sans, Ubuntu, Cantarell, "Helvetica Neue", sans-serif;
+    outline: none;
+}
+
+#shortcode-cache-cached-accordion .shortcode-cache-group-header.ui-accordion-header {
+    background: #f1f1f1;
+    border-radius: 0;
+}
+
+#shortcode-cache-cached-accordion .shortcode-cache-group-header.ui-state-active {
+    background: #e7f3ff;
+    color: #0073aa;
+}
+
+#shortcode-cache-cached-accordion .shortcode-cache-group-header:hover {
+    background: #e9e9e9;
+}
+
+#shortcode-cache-cached-accordion .shortcode-cache-group-panel {
+    padding: 0;
+}
+
+#shortcode-cache-cached-accordion .ui-accordion-content {
+    padding: 0;
+    border: none;
+    background: #fff;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Oxygen-Sans, Ubuntu, Cantarell, "Helvetica Neue", sans-serif;
+    font-size: 13px;
+    color: #23282d;
+}
+
+#shortcode-cache-cached-accordion .shortcode-cache-group-panel table.wp-list-table {
+    margin: 0;
+    border: none;
+    box-shadow: none;
+}
+
 @media (max-width: 782px) {
     .shortcode-cache-csv-section {
         grid-template-columns: 1fr;

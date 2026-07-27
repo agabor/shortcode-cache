@@ -21,6 +21,15 @@ $global_allowed_roles = shortcode_cache_get_global_allowed_roles();
 $show_success = isset( $_GET['settings-updated'] ) && $_GET['settings-updated'];
 $cached_items = shortcode_cache_get_all_cached_items();
 $all_roles = shortcode_cache_get_all_roles();
+
+$grouped_items = array();
+foreach ( $cached_items as $cache_key => $item_data ) {
+    $group_name = $item_data['shortcode'];
+    if ( ! isset( $grouped_items[ $group_name ] ) ) {
+        $grouped_items[ $group_name ] = array();
+    }
+    $grouped_items[ $group_name ][ $cache_key ] = $item_data;
+}
 ?>
 
 <div class="wrap">
@@ -262,7 +271,7 @@ $all_roles = shortcode_cache_get_all_roles();
 
     <h2><?php esc_html_e( 'Cached Items', 'shortcode-cache' ); ?></h2>
 
-    <?php if ( empty( $cached_items ) ) : ?>
+    <?php if ( empty( $grouped_items ) ) : ?>
         <p><?php esc_html_e( 'No cached items at the moment.', 'shortcode-cache' ); ?></p>
     <?php else : ?>
         <div class="shortcode-cache-actions" style="margin-bottom: 15px;">
@@ -274,46 +283,53 @@ $all_roles = shortcode_cache_get_all_roles();
             </button>
         </div>
 
-        <table class="wp-list-table widefat striped">
-            <thead>
-                <tr>
-                    <th scope="col"><?php esc_html_e( 'Shortcode', 'shortcode-cache' ); ?></th>
-                    <th scope="col"><?php esc_html_e( 'ID', 'shortcode-cache' ); ?></th>
-                    <th scope="col"><?php esc_html_e( 'Parameters', 'shortcode-cache' ); ?></th>
-                    <th scope="col"><?php esc_html_e( 'Size', 'shortcode-cache' ); ?></th>
-                    <th scope="col"><?php esc_html_e( 'Content', 'shortcode-cache' ); ?></th>
-                    <th scope="col"><?php esc_html_e( 'Action', 'shortcode-cache' ); ?></th>
-                </tr>
-            </thead>
-            <tbody>
-                <?php foreach ( $cached_items as $cache_key => $item_data ) : ?>
-                    <tr>
-                        <td><?php echo esc_html( $item_data['shortcode'] ); ?></td>
-                        <td><?php echo isset( $item_data['id'] ) && ! empty( $item_data['id'] ) ? esc_html( $item_data['id'] ) : '—'; ?></td>
-                        <td><?php echo shortcode_cache_extract_parameters_from_item( $item_data ); ?></td>
-                        <td><?php echo esc_html( shortcode_cache_format_bytes( shortcode_cache_get_size( $cache_key, 'shortcode_cache' ) ) ); ?></td>
-                        <td>
-                            <button
-                                type="button"
-                                class="button button-small shortcode-cache-view-content-btn"
-                                data-cache-key="<?php echo esc_attr( $cache_key ); ?>"
-                            >
-                                <?php esc_html_e( 'View Content', 'shortcode-cache' ); ?>
-                            </button>
-                        </td>
-                        <td>
-                            <button
-                                type="button"
-                                class="button button-small shortcode-cache-clear-btn"
-                                data-cache-key="<?php echo esc_attr( $cache_key ); ?>"
-                            >
-                                <?php esc_html_e( 'Clear Cache', 'shortcode-cache' ); ?>
-                            </button>
-                        </td>
-                    </tr>
-                <?php endforeach; ?>
-            </tbody>
-        </table>
+        <div id="shortcode-cache-cached-accordion">
+            <?php foreach ( $grouped_items as $group_name => $group_items ) : ?>
+                <h3 class="shortcode-cache-group-header">
+                    <?php echo esc_html( $group_name ); ?> (<?php echo esc_html( count( $group_items ) ); ?>)
+                </h3>
+                <div class="shortcode-cache-group-panel">
+                    <table class="wp-list-table widefat striped">
+                        <thead>
+                            <tr>
+                                <th scope="col"><?php esc_html_e( 'ID', 'shortcode-cache' ); ?></th>
+                                <th scope="col"><?php esc_html_e( 'Parameters', 'shortcode-cache' ); ?></th>
+                                <th scope="col"><?php esc_html_e( 'Size', 'shortcode-cache' ); ?></th>
+                                <th scope="col"><?php esc_html_e( 'Content', 'shortcode-cache' ); ?></th>
+                                <th scope="col"><?php esc_html_e( 'Action', 'shortcode-cache' ); ?></th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <?php foreach ( $group_items as $cache_key => $item_data ) : ?>
+                                <tr>
+                                    <td><?php echo isset( $item_data['id'] ) && ! empty( $item_data['id'] ) ? esc_html( $item_data['id'] ) : '—'; ?></td>
+                                    <td><?php echo shortcode_cache_extract_parameters_from_item( $item_data ); ?></td>
+                                    <td><?php echo esc_html( shortcode_cache_format_bytes( shortcode_cache_get_size( $cache_key, 'shortcode_cache' ) ) ); ?></td>
+                                    <td>
+                                        <button
+                                            type="button"
+                                            class="button button-small shortcode-cache-view-content-btn"
+                                            data-cache-key="<?php echo esc_attr( $cache_key ); ?>"
+                                        >
+                                            <?php esc_html_e( 'View Content', 'shortcode-cache' ); ?>
+                                        </button>
+                                    </td>
+                                    <td>
+                                        <button
+                                            type="button"
+                                            class="button button-small shortcode-cache-clear-btn"
+                                            data-cache-key="<?php echo esc_attr( $cache_key ); ?>"
+                                        >
+                                            <?php esc_html_e( 'Clear Cache', 'shortcode-cache' ); ?>
+                                        </button>
+                                    </td>
+                                </tr>
+                            <?php endforeach; ?>
+                        </tbody>
+                    </table>
+                </div>
+            <?php endforeach; ?>
+        </div>
     <?php endif; ?>
 </div>
 

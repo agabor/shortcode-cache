@@ -24,7 +24,12 @@ $all_roles = shortcode_cache_get_all_roles();
 
 $grouped_items = array();
 foreach ( $cached_items as $cache_key => $item_data ) {
-    $group_name = $item_data['shortcode'];
+    $shortcode_name = $item_data['shortcode'];
+    if ( isset( $item_data['id'] ) && ! empty( $item_data['id'] ) ) {
+        $group_name = $shortcode_name . ' — ' . $item_data['id'];
+    } else {
+        $group_name = $shortcode_name;
+    }
     if ( ! isset( $grouped_items[ $group_name ] ) ) {
         $grouped_items[ $group_name ] = array();
     }

@@ -73,6 +73,32 @@ function shortcode_cache_clear_all_cache() {
     shortcode_cache_delete_items();
 }
 
+function shortcode_cache_clear_cache_for_config_item( $shortcode_name, $shortcode_id ) {
+    $cached_items = shortcode_cache_get_items();
+    $cleared_count = 0;
+
+    foreach ( $cached_items as $cache_key => $item_data ) {
+        $item_shortcode_name = isset( $item_data['shortcode'] ) ? $item_data['shortcode'] : '';
+        $item_shortcode_id = isset( $item_data['id'] ) ? $item_data['id'] : '';
+
+        if ( $item_shortcode_name !== $shortcode_name ) {
+            continue;
+        }
+
+        if ( ! empty( $shortcode_id ) && $item_shortcode_id !== $shortcode_id ) {
+            continue;
+        }
+
+        $success = shortcode_cache_clear_specific_cache( $cache_key );
+
+        if ( $success ) {
+            $cleared_count++;
+        }
+    }
+
+    return $cleared_count;
+}
+
 function shortcode_cache_get_cached_item_content( $cache_key ) {
     $group = 'shortcode_cache';
     $content = shortcode_cache_get( $cache_key, $group );

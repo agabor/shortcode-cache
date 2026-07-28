@@ -136,10 +136,16 @@ function shortcode_cache_handle_delete_shortcode() {
         wp_send_json_error( array( 'message' => __( 'Shortcode not found', 'shortcode-cache' ) ) );
     }
 
+    $deleted_item = $config[ $index ];
+    $deleted_name = isset( $deleted_item['name'] ) ? $deleted_item['name'] : '';
+    $deleted_id = isset( $deleted_item['id'] ) ? $deleted_item['id'] : '';
+
     unset( $config[ $index ] );
     $config = array_values( $config );
 
     update_option( 'shortcode_cache_config', $config );
+
+    shortcode_cache_clear_cache_for_config_item( $deleted_name, $deleted_id );
 
     wp_send_json_success( array( 'message' => __( 'Shortcode deleted successfully', 'shortcode-cache' ) ) );
 }

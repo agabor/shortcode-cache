@@ -45,6 +45,8 @@ add_action( 'wp_ajax_shortcode_cache_get_content', 'shortcode_cache_handle_get_c
 add_action( 'wp_ajax_shortcode_cache_export_csv', 'shortcode_cache_handle_export_csv' );
 add_action( 'wp_ajax_shortcode_cache_import_csv', 'shortcode_cache_handle_import_csv' );
 
+register_deactivation_hook( __FILE__, 'shortcode_cache_on_deactivation' );
+
 function shortcode_cache_register_admin_menu() {
     $hook_suffix = add_options_page(
         __( 'Shortcode Cache Settings', 'shortcode-cache' ),
@@ -150,4 +152,8 @@ function shortcode_cache_initialize_shortcode_caching() {
             shortcode_cache_wrap_shortcode_with_cache( $shortcode_name, $shortcode_config );
         }
     }
+}
+
+function shortcode_cache_on_deactivation() {
+    shortcode_cache_clear_all_cache();
 }

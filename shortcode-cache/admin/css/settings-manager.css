@@ -428,46 +428,4 @@
     color: #23282d;
 }
 
-#shortcode-cache-cached-accordion .shortcode-cache-group-panel table.wp-list-table {
-    margin: 0;
-    border: none;
-    box-shadow: none;
-}
-
-.shortcode-cache-role-subgroup {
-    border-bottom: 1px solid #e0e0e0;
-    margin-bottom: 0;
-}
-
-.shortcode-cache-role-subgroup:last-child {
-    border-bottom: none;
-}
-
-.shortcode-cache-role-subheader {
-    padding: 10px 15px;
-    margin: 0;
-    background: #f7f7f7;
-    border-bottom: 1px solid #e5e5e5;
-    font-size: 13px;
-    font-weight: 600;
-    color: #23282d;
-    position: relative;
-    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Oxygen-Sans, Ubuntu, Cantarell, "Helvetica Neue", sans-serif;
-}
-
-.shortcode-cache-role-subheader .shortcode-cache-clear-role-group-btn {
-    float: right;
-    margin-top: -2px;
-}
-
-.shortcode-cache-role-subgroup table.wp-list-table {
-    margin: 0;
-    border: none;
-    box-shadow: none;
-}
-
-@media (max-width: 782px) {
-    .shortcode-cache-csv-section {
-        grid-template-columns: 1fr;
-    }
-}
+#shortcode-cache-cached-

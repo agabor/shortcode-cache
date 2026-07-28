@@ -199,16 +199,48 @@ foreach ( $cached_items as $cache_key => $item_data ) {
                             </label>
                         </td>
                         <td>
-                            <span class="shortcode-cache-item-note" title="<?php echo isset( $item['note'] ) && ! empty( $item['note'] ) ? esc_attr( $item['note'] ) : ''; ?>">
-                                <?php
-                                if ( isset( $item['note'] ) && ! empty( $item['note'] ) ) {
-                                    $note_display = strlen( $item['note'] ) > 50 ? substr( $item['note'], 0, 50 ) . '...' : $item['note'];
-                                    echo esc_html( $note_display );
-                                } else {
-                                    echo '—';
-                                }
-                                ?>
+                            <?php
+                            $full_note = isset( $item['note'] ) ? $item['note'] : '';
+                            $note_display = ! empty( $full_note ) ? ( strlen( $full_note ) > 50 ? substr( $full_note, 0, 50 ) . '...' : $full_note ) : '—';
+                            ?>
+                            <span
+                                class="shortcode-cache-item-note"
+                                data-index="<?php echo esc_attr( $index ); ?>"
+                                data-note="<?php echo esc_attr( $full_note ); ?>"
+                                title="<?php echo esc_attr( $full_note ); ?>"
+                            >
+                                <?php echo esc_html( $note_display ); ?>
                             </span>
+                            <button
+                                type="button"
+                                class="button button-small shortcode-cache-edit-note-btn"
+                                data-index="<?php echo esc_attr( $index ); ?>"
+                            >
+                                <?php esc_html_e( 'Edit', 'shortcode-cache' ); ?>
+                            </button>
+                            <div class="shortcode-cache-note-edit" data-index="<?php echo esc_attr( $index ); ?>" style="display:none;">
+                                <textarea
+                                    class="shortcode-cache-note-input"
+                                    data-index="<?php echo esc_attr( $index ); ?>"
+                                    rows="2"
+                                ><?php echo esc_textarea( $full_note ); ?></textarea>
+                                <div>
+                                    <button
+                                        type="button"
+                                        class="button button-small button-primary shortcode-cache-note-save-btn"
+                                        data-index="<?php echo esc_attr( $index ); ?>"
+                                    >
+                                        <?php esc_html_e( 'Save', 'shortcode-cache' ); ?>
+                                    </button>
+                                    <button
+                                        type="button"
+                                        class="button button-small shortcode-cache-note-cancel-btn"
+                                        data-index="<?php echo esc_attr( $index ); ?>"
+                                    >
+                                        <?php esc_html_e( 'Cancel', 'shortcode-cache' ); ?>
+                                    </button>
+                                </div>
+                            </div>
                         </td>
                         <td>
                             <button

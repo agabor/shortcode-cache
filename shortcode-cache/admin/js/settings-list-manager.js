@@ -76,6 +76,24 @@
                 closeRoleSelectionDialog();
             }
         });
+
+        $(document).on('click', '.shortcode-cache-edit-note-btn', function (e) {
+            e.preventDefault();
+            const index = $(this).data('index');
+            startNoteEdit(index);
+        });
+
+        $(document).on('click', '.shortcode-cache-note-cancel-btn', function (e) {
+            e.preventDefault();
+            const index = $(this).data('index');
+            cancelNoteEdit(index);
+        });
+
+        $(document).on('click', '.shortcode-cache-note-save-btn', function (e) {
+            e.preventDefault();
+            const index = $(this).data('index');
+            saveNote(index);
+        });
     }
 
     function loadAvailableRoles() {
@@ -291,6 +309,72 @@
         });
 
         display.html(html);
+    }
+
+    function getRowByIndex(index) {
+        return $('.shortcode-cache-item-index[value="' + index + '"]').closest('tr');
+    }
+
+    function startNoteEdit(index) {
+        const row = getRowByIndex(index);
+        row.find('.shortcode-cache-item-note[data-index="' + index + '"]').hide();
+        row.find('.shortcode-cache-edit-note-btn[data-index="' + index + '"]').hide();
+        row.find('.shortcode-cache-note-edit[data-index="' + index + '"]').show();
+    }
+
+    function cancelNoteEdit(index) {
+        const row = getRowByIndex(index);
+        const span = row.find('.shortcode-cache-item-note[data-index="' + index + '"]');
+        const storedNote = span.data('note') || '';
+        row.find('.shortcode-cache-note-input[data-index="' + index + '"]').val(storedNote);
+        row.find('.shortcode-cache-note-edit[data-index="' + index + '"]').hide();
+        span.show();
+        row.find('.shortcode-cache-edit-note-btn[data-index="' + index + '"]').show();
+    }
+
+    function saveNote(index) {
+        const row = getRowByIndex(index);
+        const textarea = row.find('.shortcode-cache-note-input[data-index="' + index + '"]');
+        const newNote = textarea.val().trim();
+        const saveButton = row.find('.shortcode-cache-note-save-btn[data-index="' + index + '"]');
+
+        saveButton.prop('disabled', true);
+        saveButton.text('Saving...');
+
+        $.ajax({
+            url: shortcodeCacheData.ajaxUrl,
+            type: 'POST',
+            data: {
+                action: 'shortcode_cache_update_note',
+                index: index,
+                note: newNote,
+            },
+            success: function (response) {
+                saveButton.prop('disabled', false);
+                saveButton.text('Save');
+
+                if (response.success) {
+                    const span = row.find('.shortcode-cache-item-note[data-index="' + index + '"]');
+                    const displayText = newNote.length > 50 ? newNote.substring(0, 50) + '...' : newNote;
+                    const finalDisplay = displayText ? escapeHtml(displayText) : '—';
+
+                    span.html(finalDisplay);
+                    span.attr('title', newNote);
+                    span.data('note', newNote);
+
+                    row.find('.shortcode-cache-note-edit[data-index="' + index + '"]').hide();
+                    span.show();
+                    row.find('.shortcode-cache-edit-note-btn[data-index="' + index + '"]').show();
+                } else {
+                    alert(response.data.message);
+                }
+            },
+            error: function () {
+                saveButton.prop('disabled', false);
+                saveButton.text('Save');
+                alert('An error occurred while saving the note.');
+            },
+        });
     }
 
     function escapeHtml(text) {
